@@ -438,7 +438,7 @@ export const useCreateProduct = (
 ) => {
   return useMutation({
     mutationFn: async (payload) =>
-      await fetchQuery("/vendor/products", {
+      await fetchQuery("/vendor/products/custom", {
         method: "POST",
         body: payload,
       }),
