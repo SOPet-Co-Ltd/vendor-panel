@@ -13,7 +13,9 @@
     "i18n:schema": "node ./scripts/i18n/generate-schema.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky || true"
   },
   "main": "dist/app.js",
   "module": "dist/app.mjs",
@@ -94,8 +96,10 @@
     "@vitejs/plugin-react": "4.2.1",
     "ajv": "^8.17.1",
     "autoprefixer": "^10.4.17",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "postcss": "^8.4.33",
-    "prettier": "^3.1.1",
+    "prettier": "3.8.1",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^3.4.1",
     "tsup": "^8.0.2",
@@ -104,5 +108,10 @@
     "vite-plugin-inspect": "^0.8.7",
     "vitest": "^3.0.5"
   },
-  "packageManager": "yarn@3.2.1"
+  "packageManager": "yarn@3.2.1",
+  "lint-staged": {
+    "**/*.{ts,tsx,js,jsx,json,md,css}": [
+      "prettier --write --ignore-unknown"
+    ]
+  }
 }

@@ -13,29 +13,26 @@ module.exports = {
   proseWrap: 'preserve',
 
   // Plugins for import sorting and Tailwind CSS class sorting
-  plugins: [
-    "@ianvs/prettier-plugin-sort-imports",
-    "prettier-plugin-tailwindcss"
-  ],
+  plugins: ['@ianvs/prettier-plugin-sort-imports', 'prettier-plugin-tailwindcss'],
 
   singleAttributePerLine: true,
 
   // Order for imports
   importOrder: [
-    "<BUILTIN_MODULES>",
-    "",
-    "^react$",
-    "^react-dom$",
-    "",
-    "<THIRD_PARTY_MODULES>",
-    "",
-    "@/.*",
-    "",
-    "^[.]"
+    '<BUILTIN_MODULES>',
+    '',
+    '^react$',
+    '^react-dom$',
+    '',
+    '<THIRD_PARTY_MODULES>',
+    '',
+    '@/.*',
+    '',
+    '^[.]'
   ],
-  importOrderParserPlugins: ["typescript", "jsx"],
-  importOrderTypeScriptVersion: "5.0.0",
+  importOrderParserPlugins: ['typescript', 'jsx'],
+  importOrderTypeScriptVersion: '5.0.0',
 
   // Functions to detect Tailwind classes
-  tailwindFunctions: ["clsx", "cn", "twmerge", "cva", "tw"]
+  tailwindFunctions: ['clsx', 'cn', 'twmerge', 'cva', 'tw']
 };
