@@ -1,1 +1,1 @@
-export { CustomTagCreateForm } from "./custom-tag-create-form"
+export { CustomTagCreateForm } from './custom-tag-create-form';

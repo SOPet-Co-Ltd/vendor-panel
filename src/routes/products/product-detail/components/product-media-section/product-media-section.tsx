@@ -65,19 +65,20 @@ export const ProductMediaSection = ({ product }: ProductMedisaSectionProps) => {
     }
 
     // Get file IDs from selected images
-    const fileIdsToDelete = product.images
-      ?.filter(i => ids.includes(i.id))
-      .map(i => i.id)
-      .filter((id): id is string => !!id) || []
+    const fileIdsToDelete =
+      product.images
+        ?.filter(i => ids.includes(i.id))
+        .map(i => i.id)
+        .filter((id): id is string => !!id) || [];
 
     // Delete from storage if there are file IDs
     if (fileIdsToDelete.length > 0) {
       try {
-        const { deleteFilesQuery } = await import("../../../../../lib/client/client")
-        await deleteFilesQuery(fileIdsToDelete)
+        const { deleteFilesQuery } = await import('../../../../../lib/client/client');
+        await deleteFilesQuery(fileIdsToDelete);
       } catch (error) {
         // Log error but continue with product update
-        console.error("Failed to delete files from storage:", error)
+        console.error('Failed to delete files from storage:', error);
       }
     }
 
