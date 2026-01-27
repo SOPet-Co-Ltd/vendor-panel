@@ -111,7 +111,7 @@
   "packageManager": "yarn@3.2.1",
   "lint-staged": {
     "**/*.{ts,tsx,js,jsx,json,md,css}": [
-      "prettier --write --ignore-unknown"
+      "npx prettier --write --ignore-unknown"
     ]
   }
 }

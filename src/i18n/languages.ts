@@ -1,17 +1,18 @@
- import { enUS, th } from "date-fns/locale"
-import { Language } from "./types"
+import { enUS, th } from 'date-fns/locale';
+
+import { Language } from './types';
 
 export const languages: Language[] = [
   {
-    code: "en",
-    display_name: "English",
+    code: 'en',
+    display_name: 'English',
     ltr: true,
-    date_locale: enUS,
+    date_locale: enUS
   },
   {
-    code: "th",
-    display_name: "ไทย",
+    code: 'th',
+    display_name: 'ไทย',
     ltr: true,
-    date_locale: th,
-  },
-]
+    date_locale: th
+  }
+];

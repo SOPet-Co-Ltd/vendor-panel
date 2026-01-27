@@ -1,67 +1,63 @@
-import { FetchError } from "@medusajs/js-sdk"
+import { FetchError } from '@medusajs/js-sdk';
 import {
   QueryKey,
   useMutation,
   UseMutationOptions,
-  UseQueryOptions,
   useQuery,
-} from "@tanstack/react-query"
-import { fetchQuery } from "../../lib/client"
-import { queryKeysFactory } from "../../lib/query-key-factory"
-import { queryClient } from "../../lib/query-client"
+  UseQueryOptions
+} from '@tanstack/react-query';
 
-const CUSTOM_TAGS_QUERY_KEY = "custom_tags" as const
-export const customTagsQueryKeys = queryKeysFactory(CUSTOM_TAGS_QUERY_KEY)
+import { fetchQuery } from '../../lib/client';
+import { queryClient } from '../../lib/query-client';
+import { queryKeysFactory } from '../../lib/query-key-factory';
+
+const CUSTOM_TAGS_QUERY_KEY = 'custom_tags' as const;
+export const customTagsQueryKeys = queryKeysFactory(CUSTOM_TAGS_QUERY_KEY);
 
 export interface CustomTag {
-  id: string
-  value: string
-  type: "pet_type" | "brand"
-  status: "pending" | "approved" | "rejected"
-  requested_by?: string
-  approved_by?: string
-  rejected_reason?: string
-  created_at: string
-  updated_at: string
+  id: string;
+  value: string;
+  type: 'pet_type' | 'brand';
+  status: 'pending' | 'approved' | 'rejected';
+  requested_by?: string;
+  approved_by?: string;
+  rejected_reason?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CustomTagsResponse {
-  tags: CustomTag[]
-  count: number
+  tags: CustomTag[];
+  count: number;
 }
 
 export interface CustomTagsQuery {
-  type?: "pet_type" | "brand"
+  type?: 'pet_type' | 'brand';
 }
 
 export const useCustomTags = (
   query?: CustomTagsQuery,
   options?: Omit<
-    UseQueryOptions<
-      CustomTagsResponse,
-      FetchError,
-      CustomTagsResponse,
-      QueryKey
-    >,
-    "queryKey" | "queryFn"
+    UseQueryOptions<CustomTagsResponse, FetchError, CustomTagsResponse, QueryKey>,
+    'queryKey' | 'queryFn'
   >
 ) => {
   const { data, ...rest } = useQuery({
     queryFn: () =>
-      fetchQuery("/vendor/custom-tags", {
-        method: "GET",
-        query: query as { [key: string]: string | number },
+      fetchQuery('/vendor/custom-tags', {
+        method: 'GET',
+        query: query as { [key: string]: string | number }
       }),
     queryKey: customTagsQueryKeys.list(query),
-    ...options,
-  })
+    ...options
+  });
 
-  return { data, ...rest }
-}
+  return { data, ...rest };
+};
 
 export interface CreateCustomTagPayload {
-  value: string
-  type: "pet_type" | "brand"
+  value: string;
+  type: 'pet_type' | 'brand';
 }
 
 export const useCreateCustomTag = (
@@ -73,16 +69,16 @@ export const useCreateCustomTag = (
 ) => {
   return useMutation({
     mutationFn: (payload: CreateCustomTagPayload) =>
-      fetchQuery("/vendor/custom-tags", {
-        method: "POST",
-        body: payload,
+      fetchQuery('/vendor/custom-tags', {
+        method: 'POST',
+        body: payload
       }),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
-        queryKey: customTagsQueryKeys.lists(),
-      })
-      options?.onSuccess?.(data, variables, context)
+        queryKey: customTagsQueryKeys.lists()
+      });
+      options?.onSuccess?.(data, variables, context);
     },
-    ...options,
-  })
-}
+    ...options
+  });
+};
