@@ -102,9 +102,18 @@ export const InviteUserForm = () => {
       form.reset();
     } catch (error) {
       if (isFetchError(error) && error.status === 400) {
+        toast.error(error.message);
         form.setError('root', {
           type: 'manual',
           message: error.message
+        });
+        return;
+      }
+      if (error instanceof Error) {
+        toast.error(error.message || t('general.error'));
+        form.setError('root', {
+          type: 'manual',
+          message: error.message || t('general.error')
         });
         return;
       }
