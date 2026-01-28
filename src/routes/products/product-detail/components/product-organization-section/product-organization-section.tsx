@@ -1,47 +1,44 @@
-import { PencilSquare } from "@medusajs/icons"
-import { ExtendedAdminProduct } from "../../../../../types/products"
-import { Badge, Container, Heading, Tooltip } from "@medusajs/ui"
-import { useTranslation } from "react-i18next"
-import { Link } from "react-router-dom"
-import { ActionMenu } from "../../../../../components/common/action-menu"
-import { SectionRow } from "../../../../../components/common/section"
-import { useDashboardExtension } from "../../../../../extensions"
+import { PencilSquare } from '@medusajs/icons';
+import { Badge, Container, Heading, Tooltip } from '@medusajs/ui';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+
+import { ActionMenu } from '../../../../../components/common/action-menu';
+import { SectionRow } from '../../../../../components/common/section';
+import { useDashboardExtension } from '../../../../../extensions';
+import { ExtendedAdminProduct } from '../../../../../types/products';
 
 type ProductOrganizationSectionProps = {
-  product: ExtendedAdminProduct
-}
+  product: ExtendedAdminProduct;
+};
 
-export const ProductOrganizationSection = ({
-  product,
-}: ProductOrganizationSectionProps) => {
-  const { t } = useTranslation()
-  const { getDisplays } = useDashboardExtension()
-  const petTypeTags =
-    (product.custom_tags || []).filter((ct) => ct.type === "pet_type") || []
-  const brandTags =
-    (product.custom_tags || []).filter((ct) => ct.type === "brand") || []
+export const ProductOrganizationSection = ({ product }: ProductOrganizationSectionProps) => {
+  const { t } = useTranslation();
+  const { getDisplays } = useDashboardExtension();
+  const petTypeTags = (product.custom_tags || []).filter(ct => ct.type === 'pet_type') || [];
+  const brandTags = (product.custom_tags || []).filter(ct => ct.type === 'brand') || [];
 
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">{t("products.organization.header")}</Heading>
+        <Heading level="h2">{t('products.organization.header')}</Heading>
         <ActionMenu
           groups={[
             {
               actions: [
                 {
-                  label: t("actions.edit"),
-                  to: "organization",
-                  icon: <PencilSquare />,
-                },
-              ],
-            },
+                  label: t('actions.edit'),
+                  to: 'organization',
+                  icon: <PencilSquare />
+                }
+              ]
+            }
           ]}
         />
       </div>
 
       <SectionRow
-        title={t("fields.collection")}
+        title={t('fields.collection')}
         value={
           product.collection ? (
             <OrganizationTag
@@ -53,10 +50,10 @@ export const ProductOrganizationSection = ({
       />
 
       <SectionRow
-        title={t("fields.categories")}
+        title={t('fields.categories')}
         value={
           product.categories?.length
-            ? product.categories.map((pcat) => (
+            ? product.categories.map(pcat => (
                 <OrganizationTag
                   key={pcat.id}
                   label={pcat.name}
@@ -69,11 +66,15 @@ export const ProductOrganizationSection = ({
 
       {/* Custom Tags: Pet Type */}
       <SectionRow
-        title={t("products.fields.petType.label" as any)}
+        title={t('products.fields.petType.label' as any)}
         value={
           petTypeTags.length
-            ? petTypeTags.map((ct) => (
-                <OrganizationTag key={ct.id} label={ct.value} to={`/custom-tags`} />
+            ? petTypeTags.map(ct => (
+                <OrganizationTag
+                  key={ct.id}
+                  label={ct.value}
+                  to={`/custom-tags`}
+                />
               ))
             : undefined
         }
@@ -81,29 +82,42 @@ export const ProductOrganizationSection = ({
 
       {/* Custom Tags: Brand */}
       <SectionRow
-        title={t("products.fields.brand.label" as any)}
+        title={t('products.fields.brand.label' as any)}
         value={
           brandTags.length
-            ? brandTags.map((ct) => (
-                <OrganizationTag key={ct.id} label={ct.value} to={`/custom-tags`} />
+            ? brandTags.map(ct => (
+                <OrganizationTag
+                  key={ct.id}
+                  label={ct.value}
+                  to={`/custom-tags`}
+                />
               ))
             : undefined
         }
       />
 
-      {getDisplays("product", "organize").map((Component, i) => {
-        return <Component key={i} data={product} />
+      {getDisplays('product', 'organize').map((Component, i) => {
+        return (
+          <Component
+            key={i}
+            data={product}
+          />
+        );
       })}
     </Container>
-  )
-}
+  );
+};
 
 const OrganizationTag = ({ label, to }: { label: string; to: string }) => {
   return (
     <Tooltip content={label}>
-      <Badge size="2xsmall" className="block w-fit truncate" asChild>
+      <Badge
+        size="2xsmall"
+        className="block w-fit truncate"
+        asChild
+      >
         <Link to={to}>{label}</Link>
       </Badge>
     </Tooltip>
-  )
-}
+  );
+};

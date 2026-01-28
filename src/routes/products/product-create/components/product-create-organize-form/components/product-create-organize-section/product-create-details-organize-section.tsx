@@ -1,79 +1,82 @@
-import { Heading, Select } from "@medusajs/ui"
-import { UseFormReturn } from "react-hook-form"
-import { useTranslation } from "react-i18next"
+import { Heading, Select } from '@medusajs/ui';
+import { UseFormReturn } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
-import { Form } from "../../../../../../../components/common/form"
-import { SwitchBox } from "../../../../../../../components/common/switch-box"
-import { Combobox } from "../../../../../../../components/inputs/combobox"
-import { useComboboxData } from "../../../../../../../hooks/use-combobox-data"
-import { fetchQuery } from "../../../../../../../lib/client"
-import { ProductCreateSchemaType } from "../../../../types"
-import { CategoryCombobox } from "../../../../../common/components/category-combobox"
+import { Form } from '../../../../../../../components/common/form';
+import { SwitchBox } from '../../../../../../../components/common/switch-box';
+import { Combobox } from '../../../../../../../components/inputs/combobox';
+import { useComboboxData } from '../../../../../../../hooks/use-combobox-data';
+import { fetchQuery } from '../../../../../../../lib/client';
+import { CategoryCombobox } from '../../../../../common/components/category-combobox';
+import { ProductCreateSchemaType } from '../../../../types';
 
 type ProductCreateOrganizationSectionProps = {
-  form: UseFormReturn<ProductCreateSchemaType>
-}
+  form: UseFormReturn<ProductCreateSchemaType>;
+};
 
 export const ProductCreateOrganizationSection = ({
-  form,
+  form
 }: ProductCreateOrganizationSectionProps) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   const collections = useComboboxData({
-    queryKey: ["product_collections"],
-    queryFn: (params) =>
-      fetchQuery("/vendor/product-collections", {
-        method: "GET",
-        query: params,
+    queryKey: ['product_collections'],
+    queryFn: params =>
+      fetchQuery('/vendor/product-collections', {
+        method: 'GET',
+        query: params
       }),
-    getOptions: (data) =>
+    getOptions: data =>
       data.product_collections.map((collection: any) => ({
         label: collection.title!,
-        value: collection.id!,
-      })),
-  })
+        value: collection.id!
+      }))
+  });
 
   // Fetch pet types from backend
   const petTypesData = useComboboxData({
-    queryKey: ["custom_tags", "pet_type"],
-    queryFn: (params) =>
-      fetchQuery("/vendor/custom-tags", {
-        method: "GET",
-        query: { ...params, type: "pet_type" },
+    queryKey: ['custom_tags', 'pet_type'],
+    queryFn: params =>
+      fetchQuery('/vendor/custom-tags', {
+        method: 'GET',
+        query: { ...params, type: 'pet_type' }
       }),
-    getOptions: (data) =>
+    getOptions: data =>
       data.tags?.map((tag: any) => ({
         label: tag.value,
-        value: tag.id,
-      })) || [],
-  })
+        value: tag.id
+      })) || []
+  });
 
   // Fetch brands from backend
   const brandsData = useComboboxData({
-    queryKey: ["custom_tags", "brand"],
-    queryFn: (params) =>
-      fetchQuery("/vendor/custom-tags", {
-        method: "GET",
-        query: { ...params, type: "brand" },
+    queryKey: ['custom_tags', 'brand'],
+    queryFn: params =>
+      fetchQuery('/vendor/custom-tags', {
+        method: 'GET',
+        query: { ...params, type: 'brand' }
       }),
-    getOptions: (data) =>
+    getOptions: data =>
       data.tags?.map((tag: any) => ({
         label: tag.value,
-        value: tag.id,
-      })) || [],
-  })
+        value: tag.id
+      })) || []
+  });
 
-  const petTypeOptions = petTypesData.options
-  const brandOptions = brandsData.options
+  const petTypeOptions = petTypesData.options;
+  const brandOptions = brandsData.options;
 
   return (
-    <div id="organize" className="flex flex-col gap-y-8">
-      <Heading>{t("products.organization.header")}</Heading>
+    <div
+      id="organize"
+      className="flex flex-col gap-y-8"
+    >
+      <Heading>{t('products.organization.header')}</Heading>
       <SwitchBox
         control={form.control}
         name="discountable"
-        label={t("products.fields.discountable.label")}
-        description={t("products.fields.discountable.hint")}
+        label={t('products.fields.discountable.label')}
+        description={t('products.fields.discountable.hint')}
         optional
       />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -83,9 +86,7 @@ export const ProductCreateOrganizationSection = ({
           render={({ field }) => {
             return (
               <Form.Item>
-                <Form.Label optional>
-                  {t("products.fields.collection.label")}
-                </Form.Label>
+                <Form.Label optional>{t('products.fields.collection.label')}</Form.Label>
                 <Form.Control>
                   <Combobox
                     {...field}
@@ -98,7 +99,7 @@ export const ProductCreateOrganizationSection = ({
                 </Form.Control>
                 <Form.ErrorMessage />
               </Form.Item>
-            )
+            );
           }}
         />
         <Form.Field
@@ -107,15 +108,13 @@ export const ProductCreateOrganizationSection = ({
           render={({ field }) => {
             return (
               <Form.Item>
-                <Form.Label optional>
-                  {t("products.fields.categories.label")}
-                </Form.Label>
+                <Form.Label optional>{t('products.fields.categories.label')}</Form.Label>
                 <Form.Control>
                   <CategoryCombobox {...field} />
                 </Form.Control>
                 <Form.ErrorMessage />
               </Form.Item>
-            )
+            );
           }}
         />
         <Form.Field
@@ -124,17 +123,21 @@ export const ProductCreateOrganizationSection = ({
           render={({ field }) => {
             return (
               <Form.Item>
-                <Form.Label optional>
-                  {t("products.fields.petType.label" as any)}
-                </Form.Label>
+                <Form.Label optional>{t('products.fields.petType.label' as any)}</Form.Label>
                 <Form.Control>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
                     <Select.Trigger>
                       <Select.Value />
                     </Select.Trigger>
                     <Select.Content>
-                      {petTypeOptions.map((option) => (
-                        <Select.Item key={option.value} value={option.value}>
+                      {petTypeOptions.map(option => (
+                        <Select.Item
+                          key={option.value}
+                          value={option.value}
+                        >
                           {option.label}
                         </Select.Item>
                       ))}
@@ -143,7 +146,7 @@ export const ProductCreateOrganizationSection = ({
                 </Form.Control>
                 <Form.ErrorMessage />
               </Form.Item>
-            )
+            );
           }}
         />
         <Form.Field
@@ -152,17 +155,21 @@ export const ProductCreateOrganizationSection = ({
           render={({ field }) => {
             return (
               <Form.Item>
-                <Form.Label optional>
-                  {t("products.fields.brand.label" as any)}
-                </Form.Label>
+                <Form.Label optional>{t('products.fields.brand.label' as any)}</Form.Label>
                 <Form.Control>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
                     <Select.Trigger>
                       <Select.Value />
                     </Select.Trigger>
                     <Select.Content>
-                      {brandOptions.map((option) => (
-                        <Select.Item key={option.value} value={option.value}>
+                      {brandOptions.map(option => (
+                        <Select.Item
+                          key={option.value}
+                          value={option.value}
+                        >
                           {option.label}
                         </Select.Item>
                       ))}
@@ -171,10 +178,10 @@ export const ProductCreateOrganizationSection = ({
                 </Form.Control>
                 <Form.ErrorMessage />
               </Form.Item>
-            )
+            );
           }}
         />
       </div>
     </div>
-  )
-}
+  );
+};

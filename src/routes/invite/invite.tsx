@@ -1,77 +1,109 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Alert, Button, Heading, Hint, Input, Text, toast } from "@medusajs/ui"
-import i18n from "i18next"
-import { AnimatePresence, motion } from "motion/react"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { useTranslation } from "react-i18next"
-import { decodeToken } from "react-jwt"
-import { Link, useSearchParams } from "react-router-dom"
-import * as z from "zod"
-import { Form } from "../../components/common/form"
-import AvatarBox from "../../components/common/logo-box/avatar-box"
-import { useSignUpForInvite } from "../../hooks/api/auth"
-import { useAcceptInvite } from "../../hooks/api/invites"
-import { isFetchError } from "../../lib/is-fetch-error"
+import { useEffect, useState } from 'react';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Alert, Button, Heading, Hint, Input, Text, toast } from '@medusajs/ui';
+import i18n from 'i18next';
+import { AnimatePresence, motion } from 'motion/react';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { Link, useSearchParams } from 'react-router-dom';
+import * as z from 'zod';
+
+import { Form } from '../../components/common/form';
+import AvatarBox from '../../components/common/logo-box/avatar-box';
+import { useSignUpForInvite } from '../../hooks/api/auth';
+import { useAcceptInvite } from '../../hooks/api/invites';
+import { fetchQuery } from '../../lib/client';
+import { isFetchError } from '../../lib/is-fetch-error';
 
 const CreateAccountSchema = z
   .object({
-    email: z.string().email(),
     first_name: z.string().min(1),
     last_name: z.string().min(1),
     password: z.string().min(1),
-    repeat_password: z.string().min(1),
+    repeat_password: z.string().min(1)
   })
   .superRefine(({ password, repeat_password }, ctx) => {
     if (password !== repeat_password) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: i18n.t("invite.passwordMismatch"),
-        path: ["repeat_password"],
-      })
+        message: i18n.t('invite.passwordMismatch'),
+        path: ['repeat_password']
+      });
     }
-  })
-
-// TODO: Update to V2 format
-type DecodedInvite = {
-  id: string
-  jti: any
-  exp: string
-  iat: number
-  email: string
-}
+  });
 
 export const Invite = () => {
-  const [searchParams] = useSearchParams()
-  const [success, setSuccess] = useState(false)
+  const [searchParams] = useSearchParams();
+  const [success, setSuccess] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState<string | null>(null);
+  const [inviteStatus, setInviteStatus] = useState<'loading' | 'valid' | 'invalid'>('loading');
 
-  const token = searchParams.get("token") || null
-  const invite: DecodedInvite | null = token ? decodeToken(token) : null
-  const isValidInvite = invite && validateDecodedInvite(invite)
+  const token = searchParams.get('token') || null;
+  const encryptedEmail = searchParams.get('e') || undefined;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      if (!token) {
+        setInviteStatus('invalid');
+        setInviteEmail(null);
+        return;
+      }
+
+      setInviteStatus('loading');
+      setInviteEmail(null);
+
+      try {
+        const result = await fetchQuery('/auth/invites/preview', {
+          method: 'POST',
+          body: { token, e: encryptedEmail }
+        });
+
+        const email = (result as any)?.email;
+        if (!cancelled && typeof email === 'string' && email.length > 0) {
+          setInviteEmail(email);
+          setInviteStatus('valid');
+        } else if (!cancelled) {
+          setInviteStatus('invalid');
+        }
+      } catch {
+        if (!cancelled) {
+          setInviteStatus('invalid');
+        }
+      }
+    }
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, encryptedEmail]);
 
   return (
-    <div className="bg-ui-bg-subtle relative flex min-h-dvh w-dvw items-center justify-center p-4">
+    <div className="relative flex min-h-dvh w-dvw items-center justify-center bg-ui-bg-subtle p-4">
       <div className="flex w-full max-w-[360px] flex-col items-center">
         <AvatarBox checked={success} />
         <div className="max-h-[557px] w-full will-change-contents">
-          {isValidInvite ? (
+          {inviteStatus === 'valid' && inviteEmail ? (
             <AnimatePresence>
               {!success ? (
                 <motion.div
                   key="create-account"
                   initial={false}
                   animate={{
-                    height: "557px",
-                    y: 0,
+                    height: '557px',
+                    y: 0
                   }}
                   exit={{
                     height: 0,
-                    y: 40,
+                    y: 40
                   }}
                   transition={{
                     duration: 0.8,
                     delay: 0.6,
-                    ease: [0, 0.71, 0.2, 1.01],
+                    ease: [0, 0.71, 0.2, 1.01]
                   }}
                   className="w-full will-change-transform"
                 >
@@ -79,23 +111,23 @@ export const Invite = () => {
                     initial={false}
                     animate={{
                       opacity: 1,
-                      scale: 1,
+                      scale: 1
                     }}
                     exit={{
                       opacity: 0,
-                      scale: 0.7,
+                      scale: 0.7
                     }}
                     transition={{
                       duration: 0.6,
                       delay: 0,
-                      ease: [0, 0.71, 0.2, 1.01],
+                      ease: [0, 0.71, 0.2, 1.01]
                     }}
                     key="inner-create-account"
                   >
                     <CreateView
                       onSuccess={() => setSuccess(true)}
                       token={token!}
-                      invite={invite}
+                      inviteEmail={inviteEmail}
                     />
                   </motion.div>
                 </motion.div>
@@ -104,16 +136,16 @@ export const Invite = () => {
                   key="success-view"
                   initial={{
                     opacity: 0,
-                    scale: 0.4,
+                    scale: 0.4
                   }}
                   animate={{
                     opacity: 1,
-                    scale: 1,
+                    scale: 1
                   }}
                   transition={{
                     duration: 1,
                     delay: 0.6,
-                    ease: [0, 0.71, 0.2, 1.01],
+                    ease: [0, 0.71, 0.2, 1.01]
                   }}
                   className="w-full"
                 >
@@ -121,17 +153,29 @@ export const Invite = () => {
                 </motion.div>
               )}
             </AnimatePresence>
+          ) : inviteStatus === 'loading' ? (
+            <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center gap-y-1">
+                <Heading>Validating invitation</Heading>
+                <Text
+                  size="small"
+                  className="text-center text-ui-fg-subtle"
+                >
+                  Please wait…
+                </Text>
+              </div>
+            </div>
           ) : (
             <InvalidView />
           )}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const LoginLink = () => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -139,131 +183,130 @@ const LoginLink = () => {
       <Link
         key="login-link"
         to="/login"
-        className="txt-small text-ui-fg-base transition-fg hover:text-ui-fg-base-hover focus-visible:text-ui-fg-base-hover font-medium outline-none"
+        className="hover:text-ui-fg-base-hover focus-visible:text-ui-fg-base-hover txt-small font-medium text-ui-fg-base outline-none transition-fg"
       >
-        {t("invite.backToLogin")}
+        {t('invite.backToLogin')}
       </Link>
     </div>
-  )
-}
+  );
+};
 
 const InvalidView = () => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col items-center">
       <div className="flex flex-col items-center gap-y-1">
-        <Heading>{t("invite.invalidTokenTitle")}</Heading>
-        <Text size="small" className="text-ui-fg-subtle text-center">
-          {t("invite.invalidTokenHint")}
+        <Heading>{t('invite.invalidTokenTitle')}</Heading>
+        <Text
+          size="small"
+          className="text-center text-ui-fg-subtle"
+        >
+          {t('invite.invalidTokenHint')}
         </Text>
       </div>
       <LoginLink />
     </div>
-  )
-}
+  );
+};
 
 const CreateView = ({
   onSuccess,
   token,
-  invite,
+  inviteEmail
 }: {
-  onSuccess: () => void
-  token: string
-  invite: DecodedInvite
+  onSuccess: () => void;
+  token: string;
+  inviteEmail: string;
 }) => {
-  const { t } = useTranslation()
-  const [invalid, setInvalid] = useState(false)
-
-  const [params] = useSearchParams()
-  const isFirstRun = params.get("first_run") === "true" // true when the invite page is open during a "create medusa app" run
+  const { t } = useTranslation();
+  const [invalid, setInvalid] = useState(false);
 
   const form = useForm<z.infer<typeof CreateAccountSchema>>({
     resolver: zodResolver(CreateAccountSchema),
     defaultValues: {
-      email: isFirstRun ? "" : invite.email || "",
-      first_name: "",
-      last_name: "",
-      password: "",
-      repeat_password: "",
-    },
-  })
+      first_name: '',
+      last_name: '',
+      password: '',
+      repeat_password: ''
+    }
+  });
 
-  const { mutateAsync: signUpEmailPass, isPending: isCreatingAuthUser } =
-    useSignUpForInvite()
+  const { mutateAsync: signUpEmailPass, isPending: isCreatingAuthUser } = useSignUpForInvite();
 
-  const { mutateAsync: acceptInvite, isPending: isAcceptingInvite } =
-    useAcceptInvite(token)
+  const { mutateAsync: acceptInvite, isPending: isAcceptingInvite } = useAcceptInvite(token);
 
-  const handleSubmit = form.handleSubmit(async (data) => {
+  const handleSubmit = form.handleSubmit(async data => {
     try {
       const authToken = await signUpEmailPass({
-        email: data.email,
-        password: data.password,
-      })
+        email: inviteEmail,
+        password: data.password
+      });
 
       const invitePayload = {
-        name: `${data.first_name} ${data.last_name}`,
-      }
+        name: `${data.first_name} ${data.last_name}`
+      };
 
       await acceptInvite({
         ...invitePayload,
-        auth_token: authToken,
-      })
+        auth_token: authToken
+      });
 
-      toast.success(t("invite.toast.accepted"))
+      toast.success(t('invite.toast.accepted'));
 
-      onSuccess()
+      onSuccess();
     } catch (error: any) {
-      toast.error(error.message)
+      toast.error(error.message);
       if (isFetchError(error) && error.status === 400) {
-        form.setError("root", {
-          type: "manual",
-          message: t("invite.invalidInvite"),
-        })
-        setInvalid(true)
-        return
+        form.setError('root', {
+          type: 'manual',
+          message: t('invite.invalidInvite')
+        });
+        setInvalid(true);
+        return;
       }
     }
-  })
+  });
 
-  const serverError = form.formState.errors.root?.message
+  const serverError = form.formState.errors.root?.message;
   const validationError =
-    form.formState.errors.email?.message ||
     form.formState.errors.password?.message ||
     form.formState.errors.repeat_password?.message ||
     form.formState.errors.first_name?.message ||
-    form.formState.errors.last_name?.message
+    form.formState.errors.last_name?.message;
 
   return (
     <div className="flex w-full flex-col items-center">
       <div className="mb-4 flex flex-col items-center">
-        <Heading>{t("invite.title")}</Heading>
-        <Text size="small" className="text-ui-fg-subtle text-center">
-          {t("invite.hint")}
+        <Heading>{t('invite.title')}</Heading>
+        <Text
+          size="small"
+          className="text-center text-ui-fg-subtle"
+        >
+          {t('invite.hint')}
         </Text>
       </div>
       <Form {...form}>
-        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="flex w-full flex-col gap-y-6"
+        >
           <div className="flex flex-col gap-y-2">
-            <Form.Field
-              control={form.control}
-              name="email"
-              render={({ field }) => {
-                return (
-                  <Form.Item>
-                    <Form.Control>
-                      <Input
-                        autoComplete="off"
-                        {...field}
-                        className="bg-ui-bg-field-component"
-                        placeholder={t("fields.email")}
-                      />
-                    </Form.Control>
-                  </Form.Item>
-                )
-              }}
-            />
+            <div className="rounded-lg border border-ui-border-base bg-ui-bg-base px-4 py-3 text-center">
+              <Text
+                size="small"
+                className="text-ui-fg-subtle"
+              >
+                Signing up with
+              </Text>
+              <Text className="break-all font-medium text-ui-fg-base">{inviteEmail}</Text>
+              <Text
+                size="small"
+                className="mt-1 text-ui-fg-subtle"
+              >
+                This email is tied to your invitation and can’t be changed.
+              </Text>
+            </div>
             <Form.Field
               control={form.control}
               name="first_name"
@@ -275,11 +318,11 @@ const CreateView = ({
                         autoComplete="given-name"
                         {...field}
                         className="bg-ui-bg-field-component"
-                        placeholder={t("fields.firstName")}
+                        placeholder={t('fields.firstName')}
                       />
                     </Form.Control>
                   </Form.Item>
-                )
+                );
               }}
             />
             <Form.Field
@@ -293,11 +336,11 @@ const CreateView = ({
                         autoComplete="family-name"
                         {...field}
                         className="bg-ui-bg-field-component"
-                        placeholder={t("fields.lastName")}
+                        placeholder={t('fields.lastName')}
                       />
                     </Form.Control>
                   </Form.Item>
-                )
+                );
               }}
             />
             <Form.Field
@@ -312,11 +355,11 @@ const CreateView = ({
                         type="password"
                         {...field}
                         className="bg-ui-bg-field-component"
-                        placeholder={t("fields.password")}
+                        placeholder={t('fields.password')}
                       />
                     </Form.Control>
                   </Form.Item>
-                )
+                );
               }}
             />
             <Form.Field
@@ -331,23 +374,26 @@ const CreateView = ({
                         type="password"
                         {...field}
                         className="bg-ui-bg-field-component"
-                        placeholder={t("fields.repeatPassword")}
+                        placeholder={t('fields.repeatPassword')}
                       />
                     </Form.Control>
                   </Form.Item>
-                )
+                );
               }}
             />
             {validationError && (
               <div className="mt-6 text-center">
-                <Hint className="inline-flex" variant={"error"}>
+                <Hint
+                  className="inline-flex"
+                  variant={'error'}
+                >
                   {validationError}
                 </Hint>
               </div>
             )}
             {serverError && (
               <Alert
-                className="bg-ui-bg-base items-center p-2"
+                className="items-center bg-ui-bg-base p-2"
                 dismissible
                 variant="error"
               >
@@ -361,50 +407,51 @@ const CreateView = ({
             isLoading={isCreatingAuthUser || isAcceptingInvite}
             disabled={invalid}
           >
-            {t("invite.createAccount")}
+            {t('invite.createAccount')}
           </Button>
         </form>
       </Form>
       <LoginLink />
     </div>
-  )
-}
+  );
+};
 
 const SuccessView = () => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <div className="flex w-full flex-col items-center gap-y-6">
       <div className="flex flex-col items-center gap-y-1">
-        <Heading className="text-center">{t("invite.successTitle")}</Heading>
-        <Text size="small" className="text-ui-fg-subtle text-center">
-          {t("invite.successHint")}
+        <Heading className="text-center">{t('invite.successTitle')}</Heading>
+        <Text
+          size="small"
+          className="text-center text-ui-fg-subtle"
+        >
+          {t('invite.successHint')}
         </Text>
       </div>
-      <Button variant="secondary" asChild className="w-full">
-        <Link to="/login" replace>
-          {t("invite.successAction")}
+      <Button
+        variant="secondary"
+        asChild
+        className="w-full"
+      >
+        <Link
+          to="/login"
+          replace
+        >
+          {t('invite.successAction')}
         </Link>
       </Button>
 
       <Link
         key="login-link"
         to="/login"
-        className="txt-small text-ui-fg-base transition-fg hover:text-ui-fg-base-hover focus-visible:text-ui-fg-base-hover font-medium outline-none"
+        className="hover:text-ui-fg-base-hover focus-visible:text-ui-fg-base-hover txt-small font-medium text-ui-fg-base outline-none transition-fg"
       >
-        {t("invite.backToLogin")}
+        {t('invite.backToLogin')}
       </Link>
     </div>
-  )
-}
+  );
+};
 
-const InviteSchema = z.object({
-  id: z.string(),
-  // jti: z.string(),
-  exp: z.number(),
-  iat: z.number(),
-})
-
-const validateDecodedInvite = (decoded: any): decoded is DecodedInvite => {
-  return InviteSchema.safeParse(decoded).success
-}
+// Invite token validation is handled server-side in /auth/invites/preview.
