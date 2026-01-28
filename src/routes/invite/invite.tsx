@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Button, Heading, Hint, Input, Text, toast } from '@medusajs/ui';
@@ -6,7 +6,6 @@ import i18n from 'i18next';
 import { AnimatePresence, motion } from 'motion/react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { decodeToken } from 'react-jwt';
 import { Link, useSearchParams } from 'react-router-dom';
 import * as z from 'zod';
 
@@ -14,11 +13,11 @@ import { Form } from '../../components/common/form';
 import AvatarBox from '../../components/common/logo-box/avatar-box';
 import { useSignUpForInvite } from '../../hooks/api/auth';
 import { useAcceptInvite } from '../../hooks/api/invites';
+import { fetchQuery } from '../../lib/client';
 import { isFetchError } from '../../lib/is-fetch-error';
 
 const CreateAccountSchema = z
   .object({
-    email: z.string().email(),
     first_name: z.string().min(1),
     last_name: z.string().min(1),
     password: z.string().min(1),
@@ -34,29 +33,60 @@ const CreateAccountSchema = z
     }
   });
 
-// TODO: Update to V2 format
-type DecodedInvite = {
-  id: string;
-  jti: any;
-  exp: string;
-  iat: number;
-  email: string;
-};
-
 export const Invite = () => {
   const [searchParams] = useSearchParams();
   const [success, setSuccess] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState<string | null>(null);
+  const [inviteStatus, setInviteStatus] = useState<'loading' | 'valid' | 'invalid'>('loading');
 
   const token = searchParams.get('token') || null;
-  const invite: DecodedInvite | null = token ? decodeToken(token) : null;
-  const isValidInvite = invite && validateDecodedInvite(invite);
+  const encryptedEmail = searchParams.get('e') || undefined;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      if (!token) {
+        setInviteStatus('invalid');
+        setInviteEmail(null);
+        return;
+      }
+
+      setInviteStatus('loading');
+      setInviteEmail(null);
+
+      try {
+        const result = await fetchQuery('/auth/invites/preview', {
+          method: 'POST',
+          body: { token, e: encryptedEmail }
+        });
+
+        const email = (result as any)?.email;
+        if (!cancelled && typeof email === 'string' && email.length > 0) {
+          setInviteEmail(email);
+          setInviteStatus('valid');
+        } else if (!cancelled) {
+          setInviteStatus('invalid');
+        }
+      } catch {
+        if (!cancelled) {
+          setInviteStatus('invalid');
+        }
+      }
+    }
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [token, encryptedEmail]);
 
   return (
     <div className="relative flex min-h-dvh w-dvw items-center justify-center bg-ui-bg-subtle p-4">
       <div className="flex w-full max-w-[360px] flex-col items-center">
         <AvatarBox checked={success} />
         <div className="max-h-[557px] w-full will-change-contents">
-          {isValidInvite ? (
+          {inviteStatus === 'valid' && inviteEmail ? (
             <AnimatePresence>
               {!success ? (
                 <motion.div
@@ -97,7 +127,7 @@ export const Invite = () => {
                     <CreateView
                       onSuccess={() => setSuccess(true)}
                       token={token!}
-                      invite={invite}
+                      inviteEmail={inviteEmail}
                     />
                   </motion.div>
                 </motion.div>
@@ -123,6 +153,18 @@ export const Invite = () => {
                 </motion.div>
               )}
             </AnimatePresence>
+          ) : inviteStatus === 'loading' ? (
+            <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center gap-y-1">
+                <Heading>Validating invitation</Heading>
+                <Text
+                  size="small"
+                  className="text-center text-ui-fg-subtle"
+                >
+                  Please wait…
+                </Text>
+              </div>
+            </div>
           ) : (
             <InvalidView />
           )}
@@ -171,22 +213,18 @@ const InvalidView = () => {
 const CreateView = ({
   onSuccess,
   token,
-  invite
+  inviteEmail
 }: {
   onSuccess: () => void;
   token: string;
-  invite: DecodedInvite;
+  inviteEmail: string;
 }) => {
   const { t } = useTranslation();
   const [invalid, setInvalid] = useState(false);
 
-  const [params] = useSearchParams();
-  const isFirstRun = params.get('first_run') === 'true'; // true when the invite page is open during a "create medusa app" run
-
   const form = useForm<z.infer<typeof CreateAccountSchema>>({
     resolver: zodResolver(CreateAccountSchema),
     defaultValues: {
-      email: isFirstRun ? '' : invite.email || '',
       first_name: '',
       last_name: '',
       password: '',
@@ -201,7 +239,7 @@ const CreateView = ({
   const handleSubmit = form.handleSubmit(async data => {
     try {
       const authToken = await signUpEmailPass({
-        email: data.email,
+        email: inviteEmail,
         password: data.password
       });
 
@@ -232,7 +270,6 @@ const CreateView = ({
 
   const serverError = form.formState.errors.root?.message;
   const validationError =
-    form.formState.errors.email?.message ||
     form.formState.errors.password?.message ||
     form.formState.errors.repeat_password?.message ||
     form.formState.errors.first_name?.message ||
@@ -255,24 +292,21 @@ const CreateView = ({
           className="flex w-full flex-col gap-y-6"
         >
           <div className="flex flex-col gap-y-2">
-            <Form.Field
-              control={form.control}
-              name="email"
-              render={({ field }) => {
-                return (
-                  <Form.Item>
-                    <Form.Control>
-                      <Input
-                        autoComplete="off"
-                        {...field}
-                        className="bg-ui-bg-field-component"
-                        placeholder={t('fields.email')}
-                      />
-                    </Form.Control>
-                  </Form.Item>
-                );
-              }}
-            />
+            <div className="rounded-lg border border-ui-border-base bg-ui-bg-base px-4 py-3 text-center">
+              <Text
+                size="small"
+                className="text-ui-fg-subtle"
+              >
+                Signing up with
+              </Text>
+              <Text className="break-all font-medium text-ui-fg-base">{inviteEmail}</Text>
+              <Text
+                size="small"
+                className="mt-1 text-ui-fg-subtle"
+              >
+                This email is tied to your invitation and can’t be changed.
+              </Text>
+            </div>
             <Form.Field
               control={form.control}
               name="first_name"
@@ -420,13 +454,4 @@ const SuccessView = () => {
   );
 };
 
-const InviteSchema = z.object({
-  id: z.string(),
-  // jti: z.string(),
-  exp: z.number(),
-  iat: z.number()
-});
-
-const validateDecodedInvite = (decoded: any): decoded is DecodedInvite => {
-  return InviteSchema.safeParse(decoded).success;
-};
+// Invite token validation is handled server-side in /auth/invites/preview.

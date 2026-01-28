@@ -1,20 +1,39 @@
 import { useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowPath, Link, Trash } from '@medusajs/icons';
 import { HttpTypes } from '@medusajs/types';
-import { Alert, Button, Container, Heading, Input, StatusBadge, Text, Tooltip } from '@medusajs/ui';
+import {
+  Alert,
+  Button,
+  Container,
+  Heading,
+  Input,
+  StatusBadge,
+  Text,
+  toast,
+  Tooltip,
+  usePrompt
+} from '@medusajs/ui';
 import { createColumnHelper } from '@tanstack/react-table';
+import copy from 'copy-to-clipboard';
 // import copy from 'copy-to-clipboard';
 import { format } from 'date-fns';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as zod from 'zod';
 
+import { ActionMenu } from '../../../../../components/common/action-menu';
 import { Form } from '../../../../../components/common/form';
 import { RouteFocusModal } from '../../../../../components/modals/index.ts';
 import { _DataTable } from '../../../../../components/table/data-table';
 import { KeyboundForm } from '../../../../../components/utilities/keybound-form/keybound-form.tsx';
-import { useCreateInvite, useInvites } from '../../../../../hooks/api/invites';
+import {
+  useCreateInvite,
+  useDeleteInvite,
+  useInvites,
+  useResendInvite
+} from '../../../../../hooks/api/invites';
 import { useUserInviteTableQuery } from '../../../../../hooks/table/query/use-user-invite-table-query';
 import { useDataTable } from '../../../../../hooks/use-data-table';
 import { isFetchError } from '../../../../../lib/is-fetch-error';
@@ -25,6 +44,7 @@ const InviteUserSchema = zod.object({
 
 const PAGE_SIZE = 10;
 const PREFIX = 'usr_invite';
+const INVITE_URL = `${window.location.origin}${__BASE__ === '/' ? '' : __BASE__}/invite?token=`;
 
 export const InviteUserForm = () => {
   const { t } = useTranslation();
@@ -235,8 +255,89 @@ const useColumns = () => {
           }
           return <StatusBadge color="orange">{t('users.inviteStatus.pending')}</StatusBadge>;
         }
+      }),
+      columnHelper.display({
+        id: 'actions',
+        cell: ({ row }) => <InviteActions invite={row.original} />
       })
     ],
     [t]
+  );
+};
+
+const InviteActions = ({ invite }: { invite: HttpTypes.AdminInvite }) => {
+  const { mutateAsync: revokeAsync } = useDeleteInvite(invite.id);
+  const { mutateAsync: resendAsync } = useResendInvite(invite.id);
+
+  const prompt = usePrompt();
+  const { t } = useTranslation();
+
+  const handleDelete = async () => {
+    const res = await prompt({
+      title: t('general.areYouSure'),
+      description: t('users.deleteInviteWarning', {
+        email: invite.email
+      }),
+      cancelText: t('actions.cancel'),
+      confirmText: t('actions.delete')
+    });
+
+    if (!res) {
+      return;
+    }
+
+    await revokeAsync();
+  };
+
+  const handleResend = async () => {
+    await resendAsync();
+  };
+
+  const handleCopyInviteLink = () => {
+    const token =
+      (invite as any)?.token || (invite as any)?.invite_token || (invite as any)?.inviteToken;
+
+    if (!token) {
+      toast.error('Invite token is missing. Please refresh and try again.');
+      return;
+    }
+
+    const inviteUrl = `${INVITE_URL}${token}`;
+    copy(inviteUrl);
+  };
+
+  return (
+    <ActionMenu
+      groups={[
+        {
+          actions: [
+            {
+              icon: <ArrowPath />,
+              label: t('users.resendInvite'),
+              onClick: handleResend
+            }
+          ]
+        },
+        {
+          actions: [
+            {
+              icon: <Link />,
+              label: t('users.copyInviteLink'),
+              onClick: handleCopyInviteLink
+            }
+          ]
+        },
+        {
+          actions: [
+            {
+              icon: <Trash />,
+              label: t('actions.delete'),
+              onClick: handleDelete
+            }
+          ]
+        }
+      ]}
+      data-testid={`user-invite-form-invite-action-menu-${invite.id}`}
+    />
   );
 };

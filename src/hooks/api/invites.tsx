@@ -52,7 +52,12 @@ export const useInvites = (
     queryFn: () =>
       fetchQuery('/vendor/invites', {
         method: 'GET',
-        query: query
+        query: {
+          // Mercur/Medusa can omit sensitive fields (like token) by default.
+          // Vendor UI needs token to build the invite link.
+          fields: 'id,email,role,token,expires_at,accepted,created_at,updated_at,seller',
+          ...(query || {})
+        }
       }),
     queryKey: invitesQueryKeys.list(query),
     ...options
@@ -89,7 +94,10 @@ export const useResendInvite = (
   options?: UseMutationOptions<HttpTypes.AdminInviteResponse, FetchError, void>
 ) => {
   return useMutation({
-    mutationFn: () => sdk.admin.invite.resend(id),
+    mutationFn: () =>
+      fetchQuery(`/vendor/invites/${id}/resend`, {
+        method: 'POST'
+      }),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
         queryKey: invitesQueryKeys.lists()
@@ -108,7 +116,10 @@ export const useDeleteInvite = (
   options?: UseMutationOptions<HttpTypes.AdminInviteDeleteResponse, FetchError, void>
 ) => {
   return useMutation({
-    mutationFn: () => sdk.admin.invite.delete(id),
+    mutationFn: () =>
+      fetchQuery(`/vendor/invites/${id}`, {
+        method: 'DELETE'
+      }),
     onSuccess: (data, variables, context) => {
       queryClient.invalidateQueries({
         queryKey: invitesQueryKeys.lists()
