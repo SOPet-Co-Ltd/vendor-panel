@@ -51,23 +51,69 @@ export const importProductsQuery = async (file: File) => {
     .catch(() => null);
 };
 
-export const uploadFilesQuery = async (files: any[]) => {
-  const formData = new FormData();
+export type VendorMediaUploadFile = {
+  id: string;
+  url: string;
+  filename?: string;
+  mimeType?: string;
+  blurhash?: string;
+};
 
+export type VendorMediaUploadResponse = {
+  files: VendorMediaUploadFile[];
+};
+
+export const uploadFilesQuery = async (
+  files: { file: File }[]
+): Promise<VendorMediaUploadResponse> => {
+  const formData = new FormData();
   for (const { file } of files) {
     formData.append('files', file);
   }
-
-  return await fetch(`${backendUrl}/vendor/media`, {
+  const res = await fetch(`${backendUrl}/vendor/media`, {
     method: 'POST',
     body: formData,
     headers: {
       authorization: `Bearer ${token}`,
       'x-publishable-api-key': publishableApiKey
     }
-  })
-    .then(res => res.json())
-    .catch(() => null);
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error?.error || 'Failed to upload files');
+  }
+  return res.json();
+};
+
+export type UpdateProductMediaPayload = {
+  images?: Array<{ id: string; url: string }>;
+  thumbnail?: string | null;
+  image_blurhashes?: Record<string, string>;
+};
+
+export type UpdateProductMediaResponse = {
+  product: unknown;
+};
+
+export const updateProductMedia = async (
+  productId: string,
+  payload: UpdateProductMediaPayload
+): Promise<UpdateProductMediaResponse> => {
+  const bearer = window.localStorage.getItem('medusa_auth_token') || '';
+  const res = await fetch(`${backendUrl}/vendor/products/${productId}/media`, {
+    method: 'PATCH',
+    headers: {
+      authorization: `Bearer ${bearer}`,
+      'x-publishable-api-key': publishableApiKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error?.error || 'Failed to update product media');
+  }
+  return res.json();
 };
 
 export const deleteFilesQuery = async (fileIds: string[]) => {
