@@ -45,7 +45,7 @@ export const EditStoreForm = ({ seller }: { seller: StoreVendor }) => {
       description: seller.description,
       phone: seller.phone,
       email: seller.email,
-      media: []
+      media: seller.photo ? [{ url: seller.photo, isThumbnail: false, file: null }] : []
     },
     resolver: zodResolver(EditStoreSchema)
   });
@@ -96,10 +96,12 @@ export const EditStoreForm = ({ seller }: { seller: StoreVendor }) => {
       isThumbnail: boolean;
     })[] = [];
     try {
-      if (values.media?.length) {
+      // Filter out media items that don't have a file (existing photos)
+      const mediaWithFiles = values.media?.filter(m => m.file) || [];
+      if (mediaWithFiles.length) {
         const fileReqs = [];
         fileReqs.push(
-          uploadFilesQuery(values.media).then((r: any) =>
+          uploadFilesQuery(mediaWithFiles, 'vendor-profile').then((r: any) =>
             r.files.map((f: any) => ({
               ...f,
               isThumbnail: false
@@ -115,13 +117,16 @@ export const EditStoreForm = ({ seller }: { seller: StoreVendor }) => {
       }
     }
 
+    // Use uploaded URL if new file was uploaded, otherwise use existing photo from media array or seller.photo
+    const photoUrl = uploadedMedia[0]?.url || values.media?.[0]?.url || seller.photo || '';
+
     await mutateAsync(
       {
         name: values.name,
         email: values.email,
         phone: values.phone,
         description: values.description,
-        photo: uploadedMedia[0]?.url || seller.photo || ''
+        photo: photoUrl
       },
       {
         onSuccess: () => {

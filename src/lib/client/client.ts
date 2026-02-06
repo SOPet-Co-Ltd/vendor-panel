@@ -64,13 +64,15 @@ export type VendorMediaUploadResponse = {
 };
 
 export const uploadFilesQuery = async (
-  files: { file: File }[]
+  files: { file: File }[],
+  folder?: string
 ): Promise<VendorMediaUploadResponse> => {
   const formData = new FormData();
   for (const { file } of files) {
     formData.append('files', file);
   }
-  const res = await fetch(`${backendUrl}/vendor/media`, {
+  const url = `${backendUrl}/vendor/media${folder ? `?folder=${folder}` : ''}`;
+  const res = await fetch(url, {
     method: 'POST',
     body: formData,
     headers: {
