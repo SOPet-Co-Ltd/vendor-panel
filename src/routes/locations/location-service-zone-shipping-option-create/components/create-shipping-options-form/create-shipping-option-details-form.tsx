@@ -34,12 +34,14 @@ export const CreateShippingOptionDetailsForm = ({
       }),
     queryKey: ['shipping_profiles_create_shipping_option'],
     getOptions: data =>
-      (data.shipping_profiles || []).map((profile: any) => ({
-        label: profile.shipping_profile.name.includes(':')
-          ? profile.shipping_profile.name.split(':')[1]
-          : profile.shipping_profile.name,
-        value: profile.shipping_profile.id
-      }))
+      (data.shipping_profiles || [])
+        .filter((profile: any) => profile != null && profile.shipping_profile != null)
+        .map((profile: any) => ({
+          label: profile.shipping_profile.name.includes(':')
+            ? profile.shipping_profile.name.split(':')[1]
+            : profile.shipping_profile.name,
+          value: profile.shipping_profile.id
+        }))
   });
 
   // const fulfillmentProviders = useComboboxData({

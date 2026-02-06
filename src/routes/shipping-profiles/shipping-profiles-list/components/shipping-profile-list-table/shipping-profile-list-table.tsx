@@ -30,11 +30,13 @@ export const ShippingProfileListTable = () => {
   const filters = useShippingProfileTableFilters();
 
   const { table } = useDataTable({
-    data: (shipping_profiles ?? []).map(profile => profile.shipping_profile),
+    data: (shipping_profiles ?? []).filter(
+      (profile): profile is NonNullable<typeof profile> => profile != null
+    ),
     columns,
     count,
     enablePagination: true,
-    getRowId: row => row.id,
+    getRowId: row => row?.id ?? '',
     pageSize: PAGE_SIZE
   });
 
@@ -83,7 +85,7 @@ export const ShippingProfileListTable = () => {
           }
         ]}
         isLoading={isLoading}
-        navigateTo={row => row.id}
+        navigateTo={row => row?.id ?? ''}
         queryObject={raw}
         search
         pagination

@@ -93,13 +93,20 @@ export const useShippingProfiles = (
   const { data, ...rest } = useQuery({
     queryFn: () =>
       fetchQuery('/vendor/shipping-profiles', {
-        method: 'GET'
+        method: 'GET',
+        query
       }),
     queryKey: shippingProfileQueryKeys.list(query),
     ...options
   });
 
-  const shipping_profiles = data?.shipping_profiles.map(sp => convertShippingProfileNames(sp));
+  const shipping_profiles = data?.shipping_profiles
+    ?.map(sp => {
+      // Extract shipping_profile if nested, otherwise use sp directly
+      const profile = sp?.shipping_profile || sp;
+      return convertShippingProfileNames(profile);
+    })
+    .filter((profile): profile is NonNullable<typeof profile> => profile != null);
 
   return { ...data, shipping_profiles, ...rest };
 };
