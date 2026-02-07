@@ -6,6 +6,7 @@ export type ExtendedAdminProduct = Omit<HttpTypes.AdminProduct, 'variants'> & {
   attribute_values?: ExtendedAdminProductAttributeValues[];
   variants?: ExtendedAdminProductVariant[];
   shipping_profile: HttpTypes.AdminShippingProfile;
+  metadata?: Record<string, unknown> | null;
   // Linked custom tags (via Product <-> CustomTag link)
   custom_tags?: Array<{
     id: string;

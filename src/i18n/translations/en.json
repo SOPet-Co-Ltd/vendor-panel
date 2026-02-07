@@ -711,6 +711,33 @@
         }
       }
     },
+    "searchVisibility": {
+      "header": "Search visibility",
+      "statusPublished": "Published to search",
+      "statusNotPublished": "Not published to search",
+      "publishedAt": "Published on {{date}}",
+      "mustPublishFirst": "Publish the product first to make it available for search.",
+      "publishButton": "Publish to search",
+      "unpublishButton": "Unpublish from search",
+      "unpublishConfirmTitle": "Unpublish from search?",
+      "unpublishConfirmDescription": "This product will be removed from storefront search. You can publish it again later.",
+      "requirementsTitle": "To publish to search, ensure:",
+      "requirementTitle": "Product has a title",
+      "requirementHandle": "Product has a handle",
+      "requirementPublished": "Product status is Published",
+      "requirementThumbnailOrImage": "Product has a thumbnail or at least one image",
+      "requirementVariants": "Product has at least one variant",
+      "requirementVariantPrice": "At least one variant has a price",
+      "requirementSeller": "Product is linked to your store",
+      "missingRequirements": "Missing:",
+      "missingCount_one": "{{count}} requirement missing.",
+      "missingCount_other": "{{count}} requirements missing.",
+      "lastError": "Last error:",
+      "toasts": {
+        "publishSuccess": "Product published to search.",
+        "unpublishSuccess": "Product unpublished from search."
+      }
+    },
     "stock": {
       "heading": "Manage product stock levels and locations",
       "description": "Update the stocked inventory levels for all of the product's variants.",

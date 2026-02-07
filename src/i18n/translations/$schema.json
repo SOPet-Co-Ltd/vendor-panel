@@ -2592,6 +2592,112 @@
           "required": ["header", "edit"],
           "additionalProperties": false
         },
+        "searchVisibility": {
+          "type": "object",
+          "properties": {
+            "header": {
+              "type": "string"
+            },
+            "statusPublished": {
+              "type": "string"
+            },
+            "statusNotPublished": {
+              "type": "string"
+            },
+            "publishedAt": {
+              "type": "string"
+            },
+            "mustPublishFirst": {
+              "type": "string"
+            },
+            "publishButton": {
+              "type": "string"
+            },
+            "unpublishButton": {
+              "type": "string"
+            },
+            "unpublishConfirmTitle": {
+              "type": "string"
+            },
+            "unpublishConfirmDescription": {
+              "type": "string"
+            },
+            "requirementsTitle": {
+              "type": "string"
+            },
+            "requirementTitle": {
+              "type": "string"
+            },
+            "requirementHandle": {
+              "type": "string"
+            },
+            "requirementPublished": {
+              "type": "string"
+            },
+            "requirementThumbnailOrImage": {
+              "type": "string"
+            },
+            "requirementVariants": {
+              "type": "string"
+            },
+            "requirementVariantPrice": {
+              "type": "string"
+            },
+            "requirementSeller": {
+              "type": "string"
+            },
+            "missingRequirements": {
+              "type": "string"
+            },
+            "missingCount_one": {
+              "type": "string"
+            },
+            "missingCount_other": {
+              "type": "string"
+            },
+            "lastError": {
+              "type": "string"
+            },
+            "toasts": {
+              "type": "object",
+              "properties": {
+                "publishSuccess": {
+                  "type": "string"
+                },
+                "unpublishSuccess": {
+                  "type": "string"
+                }
+              },
+              "required": ["publishSuccess", "unpublishSuccess"],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "header",
+            "statusPublished",
+            "statusNotPublished",
+            "publishedAt",
+            "mustPublishFirst",
+            "publishButton",
+            "unpublishButton",
+            "unpublishConfirmTitle",
+            "unpublishConfirmDescription",
+            "requirementsTitle",
+            "requirementTitle",
+            "requirementHandle",
+            "requirementPublished",
+            "requirementThumbnailOrImage",
+            "requirementVariants",
+            "requirementVariantPrice",
+            "requirementSeller",
+            "missingRequirements",
+            "missingCount_one",
+            "missingCount_other",
+            "lastError",
+            "toasts"
+          ],
+          "additionalProperties": false
+        },
         "stock": {
           "type": "object",
           "properties": {
@@ -2749,6 +2855,7 @@
         "variant",
         "options",
         "organization",
+        "searchVisibility",
         "stock",
         "shippingProfile",
         "toasts",

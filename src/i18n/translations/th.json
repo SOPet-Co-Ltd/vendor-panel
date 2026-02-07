@@ -711,6 +711,33 @@
         }
       }
     },
+    "searchVisibility": {
+      "header": "การมองเห็นในการค้นหา",
+      "statusPublished": "เผยแพร่ในการค้นหาแล้ว",
+      "statusNotPublished": "ยังไม่ได้เผยแพร่ในการค้นหา",
+      "publishedAt": "เผยแพร่เมื่อ {{date}}",
+      "mustPublishFirst": "เผยแพร่สินค้าก่อน จึงจะเผยแพร่ในการค้นหาได้",
+      "publishButton": "เผยแพร่ในการค้นหา",
+      "unpublishButton": "ยกเลิกการเผยแพร่ในการค้นหา",
+      "unpublishConfirmTitle": "ยกเลิกการเผยแพร่ในการค้นหา?",
+      "unpublishConfirmDescription": "สินค้านี้จะไม่แสดงในการค้นหาของร้าน คุณสามารถเผยแพร่ใหม่ได้ในภายหลัง",
+      "requirementsTitle": "เพื่อเผยแพร่ในการค้นหา ตรวจสอบว่า:",
+      "requirementTitle": "สินค้ามีชื่อ",
+      "requirementHandle": "สินค้ามี handle",
+      "requirementPublished": "สถานะสินค้าเป็น เผยแพร่แล้ว",
+      "requirementThumbnailOrImage": "สินค้ามีรูป thumbnail หรืออย่างน้อยหนึ่งรูป",
+      "requirementVariants": "สินค้ามีอย่างน้อยหนึ่ง variant",
+      "requirementVariantPrice": "อย่างน้อยหนึ่ง variant มีราคา",
+      "requirementSeller": "สินค้าผูกกับร้านของคุณ",
+      "missingRequirements": "ยังขาด:",
+      "missingCount_one": "ยังขาด {{count}} ข้อ",
+      "missingCount_other": "ยังขาด {{count}} ข้อ",
+      "lastError": "ข้อความล่าสุด:",
+      "toasts": {
+        "publishSuccess": "เผยแพร่สินค้าในการค้นหาแล้ว",
+        "unpublishSuccess": "ยกเลิกการเผยแพร่สินค้าในการค้นหาแล้ว"
+      }
+    },
     "toasts": {
       "delete": {
         "success": {
