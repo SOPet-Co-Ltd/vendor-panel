@@ -28,19 +28,19 @@ export const CreateShippingOptionDetailsForm = ({
   const isPickup = type === FulfillmentSetType.Pickup;
 
   const shippingProfiles = useComboboxData({
-    queryFn: () =>
+    queryFn: (params: { q?: string; limit?: number; offset?: number }) =>
       fetchQuery(`/vendor/shipping-profiles`, {
-        method: 'GET'
+        method: 'GET',
+        query: params as Record<string, string | number | object>
       }),
     queryKey: ['shipping_profiles_create_shipping_option'],
     getOptions: data =>
       (data.shipping_profiles || [])
-        .filter((profile: any) => profile != null && profile.shipping_profile != null)
-        .map((profile: any) => ({
-          label: profile.shipping_profile.name.includes(':')
-            ? profile.shipping_profile.name.split(':')[1]
-            : profile.shipping_profile.name,
-          value: profile.shipping_profile.id
+        .map((profile: any) => profile?.shipping_profile ?? profile)
+        .filter((sp: any) => sp != null && sp.id != null)
+        .map((sp: any) => ({
+          label: sp.name?.includes(':') ? sp.name.split(':')[1] : (sp.name ?? ''),
+          value: sp.id
         }))
   });
 
