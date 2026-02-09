@@ -179,7 +179,7 @@ export const DataTableRoot = <TData,>({
               </Table.Header>
             )}
             <Table.Body className="border-b-0">
-              {table.getRowModel().rows.map(row => {
+              {(table.getRowModel()?.rows || []).map(row => {
                 const to = navigateTo ? navigateTo(row) : undefined;
                 const isRowDisabled = hasSelect && !row.getCanSelect();
 

@@ -32,8 +32,9 @@ import { z } from 'zod';
 
 import { RouteFocusModal, useRouteModal } from '../../../../../components/modals';
 import { KeyboundForm } from '../../../../../components/utilities/keybound-form';
-import { useUpdateProduct } from '../../../../../hooks/api/products';
-import { deleteFilesQuery, uploadFilesQuery } from '../../../../../lib/client';
+import { productsQueryKeys } from '../../../../../hooks/api/products';
+import { deleteFilesQuery, updateProductMedia, uploadFilesQuery } from '../../../../../lib/client';
+import { queryClient } from '../../../../../lib/query-client';
 import { ExtendedAdminProduct } from '../../../../../types/products';
 import { UploadMediaFormItem } from '../../../common/components/upload-media-form-item';
 import { EditProductMediaSchema, MediaSchema } from '../../../product-create/constants';
@@ -95,24 +96,24 @@ export const EditProductMediaForm = ({ product }: ProductMediaViewProps) => {
     setActiveId(null);
   };
 
-  const { mutateAsync, isPending } = useUpdateProduct(product.id!);
+  const [isPending, setIsPending] = useState(false);
 
   const handleSubmit = form.handleSubmit(async ({ media }) => {
     const filesToUpload = media.map((m, i) => ({ file: m.file, index: i })).filter(m => !!m.file);
 
-    let uploaded: HttpTypes.AdminFile[] = [];
+    let uploaded: Awaited<ReturnType<typeof uploadFilesQuery>>['files'] = [];
 
     if (filesToUpload.length) {
-      const { files } = await uploadFilesQuery(filesToUpload)
-        // .then((res) => res.json())
-        .catch(() => {
-          form.setError('media', {
-            type: 'invalid_file',
-            message: t('products.media.failedToUpload')
-          });
-          return { files: [] };
+      try {
+        const response = await uploadFilesQuery(filesToUpload);
+        uploaded = response.files || [];
+      } catch {
+        form.setError('media', {
+          type: 'invalid_file',
+          message: t('products.media.failedToUpload')
         });
-      uploaded = files;
+        uploaded = [];
+      }
     }
 
     const withUpdatedUrls = media.map((entry, i) => {
@@ -120,7 +121,8 @@ export const EditProductMediaForm = ({ product }: ProductMediaViewProps) => {
       if (toUploadIndex > -1) {
         return {
           ...entry,
-          url: uploaded[toUploadIndex]?.url
+          id: uploaded[toUploadIndex]?.id ?? entry.id,
+          url: uploaded[toUploadIndex]?.url ?? entry.url
         };
       }
       return entry;
@@ -128,24 +130,35 @@ export const EditProductMediaForm = ({ product }: ProductMediaViewProps) => {
 
     const thumbnail = withUpdatedUrls.find(m => m.isThumbnail)?.url;
 
-    await mutateAsync(
-      {
-        images: withUpdatedUrls.map(file => ({
-          url: file.url,
-          id: file.id
-        })),
-        thumbnail: thumbnail || null
-      },
-      {
-        onSuccess: () => {
-          toast.success(t('products.media.successToast'));
-          handleSuccess();
-        },
-        onError: error => {
-          toast.error(error.message);
-        }
+    const existingBlurhashes =
+      (product.metadata?.image_blurhashes as Record<string, string> | undefined) ?? {};
+    const image_blurhashes: Record<string, string> = {};
+    withUpdatedUrls.forEach((entry, i) => {
+      if (!entry.id) return;
+      const toUploadIndex = filesToUpload.findIndex(m => m.index === i);
+      if (toUploadIndex > -1 && uploaded[toUploadIndex]?.blurhash) {
+        image_blurhashes[entry.id] = uploaded[toUploadIndex].blurhash!;
+      } else if (existingBlurhashes[entry.id]) {
+        image_blurhashes[entry.id] = existingBlurhashes[entry.id];
       }
-    );
+    });
+
+    setIsPending(true);
+    try {
+      await updateProductMedia(product.id!, {
+        images: withUpdatedUrls.map(file => ({ url: file.url!, id: file.id! })),
+        thumbnail: thumbnail || null,
+        image_blurhashes
+      });
+      await queryClient.invalidateQueries({ queryKey: productsQueryKeys.lists() });
+      await queryClient.invalidateQueries({ queryKey: productsQueryKeys.detail(product.id!) });
+      toast.success(t('products.media.successToast'));
+      handleSuccess();
+    } catch (error: any) {
+      toast.error(error?.message ?? 'Failed to update product media');
+    } finally {
+      setIsPending(false);
+    }
   });
 
   const handleCheckedChange = useCallback(

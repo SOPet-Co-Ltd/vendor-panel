@@ -9,6 +9,7 @@ import { ProductGeneralSection } from './components/product-general-section';
 import { ProductMediaSection } from './components/product-media-section';
 import { ProductOptionSection } from './components/product-option-section';
 import { ProductOrganizationSection } from './components/product-organization-section';
+import { ProductSearchVisibilitySection } from './components/product-search-visibility-section';
 import { ProductVariantSection } from './components/product-variant-section';
 
 export const ProductDetail = () => {
@@ -59,6 +60,7 @@ export const ProductDetail = () => {
         <ProductOrganizationSection product={product} />
         {/* <ProductAttributeSection product={product} /> */}
         <ProductAdditionalAttributesSection product={product} />
+        <ProductSearchVisibilitySection product={product} />
       </TwoColumnPage.Sidebar>
     </TwoColumnPage>
   );
