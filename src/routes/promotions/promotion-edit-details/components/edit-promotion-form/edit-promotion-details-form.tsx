@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AdminPromotion } from '@medusajs/types';
-import { Button, Input, RadioGroup, Text } from '@medusajs/ui';
-import { useForm } from 'react-hook-form';
+import { Button, CurrencyInput, Input, RadioGroup, Text } from '@medusajs/ui';
+import { useForm, useWatch } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import * as zod from 'zod';
 
@@ -10,6 +10,7 @@ import { DeprecatedPercentageInput } from '../../../../../components/inputs/perc
 import { RouteDrawer, useRouteModal } from '../../../../../components/modals';
 import { KeyboundForm } from '../../../../../components/utilities/keybound-form';
 import { useUpdatePromotion } from '../../../../../hooks/api/promotions';
+import { getCurrencySymbol } from '../../../../../lib/data/currencies';
 
 type EditPromotionFormProps = {
   promotion: AdminPromotion;
@@ -41,6 +42,11 @@ export const EditPromotionDetailsForm = ({ promotion }: EditPromotionFormProps) 
   });
 
   const { mutateAsync, isPending } = useUpdatePromotion(promotion.id);
+  const watchValueType = useWatch({
+    control: form.control,
+    name: 'value_type'
+  });
+  const isFixedValueType = watchValueType === 'fixed';
 
   const handleSubmit = form.handleSubmit(async data => {
     await mutateAsync(
@@ -49,6 +55,7 @@ export const EditPromotionDetailsForm = ({ promotion }: EditPromotionFormProps) 
         code: data.code,
         status: data.status,
         application_method: {
+          type: data.value_type,
           value: data.value,
           max_quantity: data.max_quantity
         }
@@ -172,22 +179,68 @@ export const EditPromotionDetailsForm = ({ promotion }: EditPromotionFormProps) 
 
             <Form.Field
               control={form.control}
-              name="value"
-              render={({ field: { onChange, ...field } }) => {
+              name="value_type"
+              render={({ field }) => {
                 return (
                   <Form.Item>
-                    <Form.Label>{t('fields.percentage')}</Form.Label>
+                    <Form.Label>{t('promotions.fields.value_type')}</Form.Label>
                     <Form.Control>
-                      <DeprecatedPercentageInput
-                        key="amount"
-                        min={0}
-                        max={100}
+                      <RadioGroup
+                        className="flex-col gap-y-3"
                         {...field}
-                        value={field.value || ''}
-                        onChange={e => {
-                          onChange(e.target.value === '' ? null : parseInt(e.target.value));
-                        }}
-                      />
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <RadioGroup.ChoiceBox
+                          value="fixed"
+                          label={t('promotions.form.value_type.fixed.title')}
+                          description={t('promotions.form.value_type.fixed.description')}
+                        />
+                        <RadioGroup.ChoiceBox
+                          value="percentage"
+                          label={t('promotions.form.value_type.percentage.title')}
+                          description={t('promotions.form.value_type.percentage.description')}
+                        />
+                      </RadioGroup>
+                    </Form.Control>
+                    <Form.ErrorMessage />
+                  </Form.Item>
+                );
+              }}
+            />
+
+            <Form.Field
+              control={form.control}
+              name="value"
+              render={({ field: { onChange, ...field } }) => {
+                const currencyCode = promotion.application_method?.currency_code ?? 'USD';
+                return (
+                  <Form.Item>
+                    <Form.Label>
+                      {isFixedValueType ? t('fields.amount') : t('fields.percentage')}
+                    </Form.Label>
+                    <Form.Control>
+                      {isFixedValueType ? (
+                        <CurrencyInput
+                          min={0}
+                          onValueChange={val => onChange(val ? parseFloat(val) : 0)}
+                          code={currencyCode}
+                          symbol={getCurrencySymbol(currencyCode)}
+                          {...field}
+                          value={field.value}
+                        />
+                      ) : (
+                        <DeprecatedPercentageInput
+                          key="amount"
+                          min={0}
+                          max={100}
+                          {...field}
+                          value={field.value || ''}
+                          onChange={e => {
+                            onChange(e.target.value === '' ? null : parseFloat(e.target.value));
+                          }}
+                        />
+                      )}
                     </Form.Control>
                     <Form.ErrorMessage />
                   </Form.Item>

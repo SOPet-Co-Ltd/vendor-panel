@@ -726,8 +726,10 @@
       "requirementHandle": "Product has a handle",
       "requirementPublished": "Product status is Published",
       "requirementThumbnailOrImage": "Product has a thumbnail or at least one image",
+      "requirementDescription": "Product has a description",
       "requirementVariants": "Product has at least one variant",
       "requirementVariantPrice": "At least one variant has a price",
+      "requirementVariantLocation": "At least one variant has inventory at a stock location",
       "requirementSeller": "Product is linked to your store",
       "missingRequirements": "Missing:",
       "missingCount_one": "{{count}} requirement missing.",
@@ -2028,6 +2030,20 @@
       "promotionCreateSuccess": "Promotion ({{code}}) was successfully created."
     },
     "create": {},
+    "templates": {
+      "percentage_off_product": {
+        "title": "Percentage off product",
+        "description": "Discounts a percentage off selected products"
+      },
+      "buy_get": {
+        "title": "Buy X Get Y",
+        "description": "Buy X product(s), get Y product(s)"
+      },
+      "shipping_discount": {
+        "title": "Shipping discount",
+        "description": "Discount on shipping. Use percentage (e.g. 100% = free) or a fixed amount off."
+      }
+    },
     "edit": {
       "title": "Edit Promotion Details",
       "rules": {

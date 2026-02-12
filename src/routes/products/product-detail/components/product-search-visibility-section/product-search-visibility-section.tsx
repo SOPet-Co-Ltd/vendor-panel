@@ -19,6 +19,7 @@ function usePublishRequirements(product: ExtendedAdminProduct) {
   return useMemo(() => {
     const hasTitle = Boolean(product.title?.trim());
     const hasHandle = Boolean(product.handle?.trim());
+    const hasDescription = Boolean(product.description?.trim());
     const isPublished = product.status === 'published';
     const hasThumbnailOrImage =
       Boolean(product.thumbnail?.trim()) ||
@@ -26,21 +27,37 @@ function usePublishRequirements(product: ExtendedAdminProduct) {
     const hasVariants = (product.variants?.length ?? 0) > 0;
     const hasVariantPrice =
       hasVariants && (product.variants?.some(v => (v.prices?.length ?? 0) > 0) ?? false);
+    const hasVariantLocation =
+      hasVariants &&
+      product.variants!.some(v => {
+        const fromInventory =
+          Array.isArray(v.inventory) &&
+          v.inventory.some(inv => (inv?.location_levels?.length ?? 0) > 0);
+        if (fromInventory) return true;
+        const fromInventoryItems =
+          Array.isArray(v.inventory_items) &&
+          v.inventory_items.some(item => (item?.inventory?.location_levels?.length ?? 0) > 0);
+        return fromInventoryItems;
+      });
 
     return {
       hasTitle,
       hasHandle,
+      hasDescription,
       isPublished,
       hasThumbnailOrImage,
       hasVariants,
       hasVariantPrice,
+      hasVariantLocation,
       allMet:
         hasTitle &&
         hasHandle &&
+        hasDescription &&
         isPublished &&
         hasThumbnailOrImage &&
         hasVariants &&
-        hasVariantPrice
+        hasVariantPrice &&
+        hasVariantLocation
     };
   }, [product]);
 }
@@ -124,6 +141,11 @@ export const ProductSearchVisibilitySection = ({
       label: t('products.searchVisibility.requirementThumbnailOrImage')
     },
     {
+      key: 'description',
+      met: requirements.hasDescription,
+      label: t('products.searchVisibility.requirementDescription')
+    },
+    {
       key: 'variants',
       met: requirements.hasVariants,
       label: t('products.searchVisibility.requirementVariants')
@@ -132,6 +154,11 @@ export const ProductSearchVisibilitySection = ({
       key: 'variantPrice',
       met: requirements.hasVariantPrice,
       label: t('products.searchVisibility.requirementVariantPrice')
+    },
+    {
+      key: 'variantLocation',
+      met: requirements.hasVariantLocation,
+      label: t('products.searchVisibility.requirementVariantLocation')
     },
     {
       key: 'seller',

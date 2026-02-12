@@ -726,8 +726,10 @@
       "requirementHandle": "สินค้ามี handle",
       "requirementPublished": "สถานะสินค้าเป็น เผยแพร่แล้ว",
       "requirementThumbnailOrImage": "สินค้ามีรูป thumbnail หรืออย่างน้อยหนึ่งรูป",
+      "requirementDescription": "สินค้ามีคำอธิบาย",
       "requirementVariants": "สินค้ามีอย่างน้อยหนึ่ง variant",
       "requirementVariantPrice": "อย่างน้อยหนึ่ง variant มีราคา",
+      "requirementVariantLocation": "อย่างน้อยหนึ่ง variant มีสต็อกที่สถานที่จัดเก็บ",
       "requirementSeller": "สินค้าผูกกับร้านของคุณ",
       "missingRequirements": "ยังขาด:",
       "missingCount_one": "ยังขาด {{count}} ข้อ",
@@ -2028,6 +2030,20 @@
       "promotionCreateSuccess": "โปรโมชั่น ({{code}}) ถูกสร้างเรียบร้อยแล้ว"
     },
     "create": {},
+    "templates": {
+      "percentage_off_product": {
+        "title": "ส่วนลดเปอร์เซ็นต์ต่อสินค้า",
+        "description": "ให้ส่วนลดเปอร์เซ็นต์กับสินค้าที่เลือก"
+      },
+      "buy_get": {
+        "title": "ซื้อ X แถม Y",
+        "description": "ซื้อสินค้า X ชิ้น แถมสินค้า Y ชิ้น"
+      },
+      "shipping_discount": {
+        "title": "ส่วนลดค่าจัดส่ง",
+        "description": "ส่วนลดค่าจัดส่ง ใช้เปอร์เซ็นต์ (เช่น 100% = ฟรี) หรือจำนวนเงินคงที่"
+      }
+    },
     "edit": {
       "title": "แก้ไขรายละเอียดโปรโมชั่น",
       "rules": {
