@@ -8,6 +8,19 @@ import { queryKeysFactory } from '../../lib/query-key-factory';
 const STRIPE_QUERY_KEY = 'stripe' as const;
 export const stripeQueryKeys = queryKeysFactory(STRIPE_QUERY_KEY);
 
+export type VendorPayout = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  amount: number;
+  currency_code: string;
+  data?: Record<string, unknown>;
+};
+
+export type VendorPayoutsResponse = {
+  payouts: VendorPayout[];
+};
+
 export const useStripeAccount = () => {
   const { data, ...rest } = useQuery({
     queryFn: () =>
@@ -54,4 +67,23 @@ export const useCreateStripeOnboarding = (options?: UseMutationOptions<any, Fetc
     },
     ...options
   });
+};
+
+export const useVendorPayouts = (query?: { limit?: number; offset?: number }) => {
+  const result = useQuery<VendorPayoutsResponse>({
+    queryKey: [STRIPE_QUERY_KEY, 'payouts', query],
+    queryFn: () =>
+      fetchQuery('/vendor/payouts', {
+        method: 'GET',
+        query: query as Record<string, string | number | undefined>
+      })
+  });
+
+  return {
+    payouts: result.data?.payouts ?? [],
+    isLoading: result.isLoading,
+    isError: result.isError,
+    error: result.error,
+    ...result
+  };
 };

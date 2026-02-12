@@ -27,8 +27,6 @@ enum Tab {
 
 type TabState = Record<Tab, ProgressStatus>;
 
-const SAVE_DRAFT_BUTTON = 'save-draft-button';
-
 type ProductCreateFormProps = {
   defaultChannel?: HttpTypes.AdminSalesChannel;
   store?: HttpTypes.AdminStore;
@@ -87,14 +85,7 @@ export const ProductCreateForm = ({ defaultChannel, store }: ProductCreateFormPr
     [watchedVariants]
   );
 
-  const handleSubmit = form.handleSubmit(async (values, e) => {
-    let isDraftSubmission = false;
-
-    if (e?.nativeEvent instanceof SubmitEvent) {
-      const submitter = e?.nativeEvent?.submitter as HTMLButtonElement;
-      isDraftSubmission = submitter.dataset.name === SAVE_DRAFT_BUTTON;
-    }
-
+  const handleSubmit = form.handleSubmit(async values => {
     const media = values.media || [];
     const payload = { ...values, media: undefined };
 
@@ -103,11 +94,15 @@ export const ProductCreateForm = ({ defaultChannel, store }: ProductCreateFormPr
     })[] = [];
     try {
       if (media.length) {
-        const thumbnailReq = media.filter(m => m.isThumbnail);
-        const otherMediaReq = media.filter(m => !m.isThumbnail);
+        const thumbnailReq = media
+          .filter(m => m.isThumbnail && m.file)
+          .map(m => ({ file: m.file as File }));
+        const otherMediaReq = media
+          .filter(m => !m.isThumbnail && m.file)
+          .map(m => ({ file: m.file as File }));
 
         const fileReqs = [];
-        if (thumbnailReq?.length) {
+        if (thumbnailReq.length) {
           fileReqs.push(
             uploadFilesQuery(thumbnailReq).then((r: any) =>
               r.files.map((f: any) => ({
@@ -117,7 +112,7 @@ export const ProductCreateForm = ({ defaultChannel, store }: ProductCreateFormPr
             )
           );
         }
-        if (otherMediaReq?.length) {
+        if (otherMediaReq.length) {
           fileReqs.push(
             uploadFilesQuery(otherMediaReq).then((r: any) =>
               r.files.map((f: any) => ({
@@ -147,7 +142,7 @@ export const ProductCreateForm = ({ defaultChannel, store }: ProductCreateFormPr
     await mutateAsync(
       {
         ...payload,
-        status: isDraftSubmission ? 'draft' : 'proposed',
+        status: 'proposed',
         images: uploadedMedia,
         weight: parseInt(payload.weight || '') || undefined,
         length: parseInt(payload.length || '') || undefined,
@@ -249,7 +244,7 @@ export const ProductCreateForm = ({ defaultChannel, store }: ProductCreateFormPr
     <RouteFocusModal.Form form={form}>
       <KeyboundForm
         onKeyDown={e => {
-          // We want to continue to the next tab on enter instead of saving as draft immediately
+          // We want to continue to the next tab on enter instead of submitting immediately
           if (e.key === 'Enter') {
             if (e.target instanceof HTMLTextAreaElement && !(e.metaKey || e.ctrlKey)) {
               return;
@@ -366,15 +361,6 @@ export const ProductCreateForm = ({ defaultChannel, store }: ProductCreateFormPr
                 {t('actions.cancel')}
               </Button>
             </RouteFocusModal.Close>
-            <Button
-              data-name={SAVE_DRAFT_BUTTON}
-              size="small"
-              type="submit"
-              isLoading={isPending}
-              className="whitespace-nowrap"
-            >
-              Draft
-            </Button>
             <PrimaryButton
               tab={tab}
               next={onNext}

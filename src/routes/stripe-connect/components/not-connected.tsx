@@ -7,7 +7,7 @@ export const NotConnected = () => {
   const { mutateAsync, isPending } = useCreateStripeAccount();
 
   return (
-    <div className="my-32 flex flex-col items-center justify-center text-center">
+    <div className="my-32 flex max-w-md flex-col items-center justify-center text-center">
       <ExclamationCircle />
       <Heading
         level="h2"
@@ -16,25 +16,26 @@ export const NotConnected = () => {
         Not connected
       </Heading>
       <Text
-        className="text-ui-fg-subtle"
+        className="mt-2 text-ui-fg-subtle"
         size="small"
       >
-        No stripe connection
+        To get paid for your orders, you must connect your store to Stripe. The marketplace will
+        send your earnings to the bank account you add in Stripe.
+      </Text>
+      <Text
+        className="mt-2 text-ui-fg-subtle"
+        size="small"
+      >
+        Click below to create your payout account; you will then complete Stripe's onboarding
+        (business details and bank account).
       </Text>
       <Button
         isLoading={isPending}
-        className="mt-4"
+        className="mt-6"
         onClick={() =>
           mutateAsync({
             context: {
-              country: 'US'
-              // external_account: {
-              //   object: 'bank_account',
-              //   country: 'US',
-              //   currency: 'usd',
-              //   account_number: '000123456789',
-              //   routing_number: '110000000',
-              // },
+              country: 'TH'
             }
           })
         }
