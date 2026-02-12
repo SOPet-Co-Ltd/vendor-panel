@@ -144,7 +144,7 @@ export const CreatePromotionForm = () => {
             ...applicationMethodData,
             ...applicationMethodRuleData,
             target_rules: buildRulesData(targetRulesData),
-            type: 'percentage'
+            buy_rules: buildRulesData(buyRulesData)
           },
           is_automatic: is_automatic === 'true'
         },
@@ -266,7 +266,7 @@ export const CreatePromotionForm = () => {
     for (const [key, value] of Object.entries(currentTemplate.defaults)) {
       if (typeof value === 'object') {
         for (const [subKey, subValue] of Object.entries(value)) {
-          setValue(`application_method.${subKey}` as keyof typeof defaultValues, subValue);
+          setValue(`application_method.${subKey}` as keyof typeof defaultValues, subValue as never);
         }
       } else {
         setValue(key as keyof typeof defaultValues, value);
@@ -343,6 +343,7 @@ export const CreatePromotionForm = () => {
           ...DEFAULT_CAMPAIGN_VALUES,
           budget: {
             ...DEFAULT_CAMPAIGN_VALUES.budget,
+            type: 'usage',
             currency_code: formData.application_method.currency_code
           }
         });
@@ -432,16 +433,16 @@ export const CreatePromotionForm = () => {
                               {...field}
                               onValueChange={field.onChange}
                             >
-                              {templates.map(template => {
-                                return (
-                                  <RadioGroup.ChoiceBox
-                                    key={template.id}
-                                    value={template.id}
-                                    label={template.title}
-                                    description={template.description}
-                                  />
-                                );
-                              })}
+                              {templates.map(template => (
+                                <RadioGroup.ChoiceBox
+                                  key={template.id}
+                                  value={template.id}
+                                  label={t(`promotions.templates.${template.id}.title` as never)}
+                                  description={t(
+                                    `promotions.templates.${template.id}.description` as never
+                                  )}
+                                />
+                              ))}
                             </RadioGroup>
                           </Form.Control>
                           <Form.ErrorMessage />
@@ -465,14 +466,14 @@ export const CreatePromotionForm = () => {
                   >
                     {t(`promotions.sections.details`)}
 
-                    {currentTemplate?.title && (
+                    {currentTemplate && (
                       <Badge
                         className="ml-2 align-middle"
                         color="grey"
                         size="2xsmall"
                         rounded="full"
                       >
-                        {currentTemplate?.title}
+                        {t(`promotions.templates.${currentTemplate.id}.title` as never)}
                       </Badge>
                     )}
                   </Heading>

@@ -16,7 +16,7 @@ export const ProductDetail = () => {
   const { id } = useParams();
   const { product, isLoading, isError, error } = useProduct(id!, {
     fields:
-      '*variants.inventory_items,*categories,attribute_values.*,attribute_values.attribute.*,+custom_tags'
+      '*variants.inventory_items,*variants.inventory_items.inventory,*variants.inventory_items.inventory.location_levels,*categories,attribute_values.*,attribute_values.attribute.*,+custom_tags'
   });
 
   const { getWidgets } = useDashboardExtension();

@@ -48,10 +48,15 @@ export const CreatePromotionSchema = z
   })
   .refine(
     data => {
+      if (data.type === 'buyget') {
+        return true;
+      }
+      if (data.application_method.target_type === 'shipping_methods') {
+        return true;
+      }
       if (data.application_method.allocation === 'across') {
         return true;
       }
-
       return (
         data.application_method.allocation === 'each' &&
         typeof data.application_method.max_quantity === 'number'
