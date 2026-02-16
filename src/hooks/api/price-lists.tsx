@@ -77,11 +77,21 @@ export const usePriceLists = (
     ...options
   });
 
-  const price_lists: ExtendedPriceList[] = (data?.price_lists || [])
-    .filter(item => item.price_list)
-    .map(item => ({ ...item.price_list, id: item.price_list.id }));
+  const rawList = data?.price_lists ?? [];
+  const price_lists: ExtendedPriceList[] = rawList
+    .map(item => {
+      const pl =
+        item && typeof item === 'object' && 'price_list' in item && item.price_list
+          ? item.price_list
+          : item;
+      if (pl && typeof pl === 'object' && 'id' in pl) {
+        return { ...pl, id: (pl as { id: string }).id } as ExtendedPriceList;
+      }
+      return null;
+    })
+    .filter((pl): pl is ExtendedPriceList => pl != null);
 
-  const count = price_lists?.length;
+  const count = typeof data?.count === 'number' ? data.count : price_lists.length;
 
   return { ...data, price_lists, count, ...rest };
 };
