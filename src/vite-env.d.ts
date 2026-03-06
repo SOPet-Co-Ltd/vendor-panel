@@ -4,6 +4,8 @@ interface ImportMetaEnv {
   readonly VITE_MEDUSA_ADMIN_BACKEND_URL: string;
   readonly VITE_MEDUSA_STOREFRONT_URL: string;
   readonly VITE_MEDUSA_V2: 'true' | 'false';
+  /** Optional: dev backend origin to rewrite in image URLs (default: http://localhost:9000) */
+  readonly VITE_DEV_BACKEND_ORIGIN?: string;
 }
 
 interface ImportMeta {

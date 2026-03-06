@@ -1,13 +1,14 @@
 import { backendUrl } from '../lib/client';
 
-export default function imagesConverter(images: string) {
-  const isLocalhost =
-    images.startsWith('http://localhost:9000') || images.startsWith('https://localhost:9000');
+const devBackendOrigin = import.meta.env.VITE_DEV_BACKEND_ORIGIN || 'http://localhost:9000';
+const devBackendOriginHttps = devBackendOrigin.replace(/^http:\/\//i, 'https://');
 
-  if (isLocalhost) {
-    return images
-      .replace('http://localhost:9000', backendUrl)
-      .replace('https://localhost:9000', backendUrl);
+export default function imagesConverter(images: string) {
+  const isDevOrigin =
+    images.startsWith(devBackendOrigin) || images.startsWith(devBackendOriginHttps);
+
+  if (isDevOrigin) {
+    return images.replace(devBackendOrigin, backendUrl).replace(devBackendOriginHttps, backendUrl);
   }
 
   return images;
