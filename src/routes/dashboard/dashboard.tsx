@@ -35,18 +35,12 @@ export const Dashboard = () => {
     throw error;
   }
 
-  if (
-    !onboarding?.products ||
-    !onboarding?.locations_shipping ||
-    !onboarding?.store_information
-    // !onboarding?.stripe_connect
-  )
+  if (!onboarding?.products || !onboarding?.locations_shipping || !onboarding?.store_information)
     return (
       <DashboardOnboarding
         products={onboarding?.products}
         locations_shipping={onboarding?.locations_shipping}
         store_information={onboarding?.store_information}
-        stripe_connect={onboarding?.stripe_connect}
       />
     );
 

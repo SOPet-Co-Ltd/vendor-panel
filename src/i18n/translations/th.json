@@ -3101,5 +3101,137 @@
     "title": "เข้าร่วม Mercur Seller Panel",
     "hint": "ลงทะเบียนเพื่อเริ่มขาย",
     "alreadySeller": "มีบัญชีอยู่แล้ว? - <0>เข้าสู่ระบบ</0>"
+  },
+  "payoutAccount": {
+    "domain": "บัญชีรับเงิน",
+    "header": {
+      "title": "บัญชีรับเงิน",
+      "description": "เชื่อมต่อบัญชีธนาคารที่ Omise จะใช้สำหรับโอนเงินให้ผู้ขาย",
+      "notConnected": "ยังไม่เชื่อมต่อ",
+      "loading": "กำลังโหลด"
+    },
+    "balance": {
+      "title": "ยอดเงินรับ",
+      "description": "ยอดขาย ยอดรอโอน และยอดที่โอนแล้วแยกตามสกุลเงิน",
+      "sellerSold": "ยอดขาย",
+      "pending": "รอโอน",
+      "paid": "โอนแล้ว",
+      "status": "สถานะ"
+    },
+    "transactions": {
+      "title": "รายการโอนเงิน",
+      "description": "บันทึกรายการโอนเงินล่าสุด",
+      "runPayout": "รันการโอนเงินทันที",
+      "noData": "ยังไม่มีรายการโอนเงิน",
+      "columns": {
+        "date": "วันที่",
+        "amount": "จำนวนเงิน",
+        "status": "สถานะ",
+        "transactionId": "รหัสรายการ",
+        "detail": "รายละเอียด"
+      },
+      "expanded": {
+        "transferId": "รหัสการโอน:",
+        "updatedAt": "อัปเดตเมื่อ:",
+        "reason": "เหตุผล:"
+      },
+      "actions": {
+        "view": "ดู",
+        "hide": "ซ่อน"
+      }
+    },
+    "bankAccount": {
+      "title": "บัญชีธนาคาร",
+      "accountName": "ชื่อบัญชี",
+      "accountNumber": "เลขบัญชี",
+      "omiseRecipientId": "รหัสผู้รับเงิน Omise",
+      "individualAccount": "บัญชีบุคคลธรรมดา",
+      "corporateAccount": "บัญชีนิติบุคคล"
+    },
+    "form": {
+      "createButton": "สร้างบัญชีรับเงิน",
+      "editButton": "แก้ไขบัญชีรับเงิน",
+      "modalTitleCreate": "สร้างบัญชีรับเงิน",
+      "modalTitleEdit": "แก้ไขบัญชีรับเงิน",
+      "modalDescription": "ตรวจสอบรายละเอียดและส่งเพื่อดำเนินการอนุมัติ",
+      "fields": {
+        "recipientName": "ชื่อผู้รับเงิน",
+        "recipientNamePlaceholder": "กรอกชื่อผู้รับเงิน",
+        "email": "อีเมล",
+        "emailPlaceholder": "กรอกอีเมล",
+        "accountType": "ประเภทบัญชี",
+        "individual": "บุคคลธรรมดา",
+        "corporation": "นิติบุคคล",
+        "taxId": "เลขประจำตัวผู้เสียภาษี",
+        "taxIdPlaceholder": "กรอกเลขประจำตัวผู้เสียภาษี",
+        "bankCode": "รหัสธนาคาร",
+        "bankCodePlaceholder": "เลือกธนาคารไทย",
+        "bankAccountName": "ชื่อบัญชีธนาคาร",
+        "bankAccountNamePlaceholder": "กรอกชื่อบัญชีธนาคาร",
+        "bankAccountNumber": "เลขบัญชีธนาคาร",
+        "bankAccountNumberPlaceholder": "กรอกเลขบัญชีธนาคาร"
+      },
+      "footer": {
+        "cancel": "ยกเลิก",
+        "submitCreate": "อนุมัติและสร้างบัญชีรับเงิน",
+        "submitEdit": "อนุมัติการเปลี่ยนแปลงบัญชีรับเงิน"
+      },
+      "toast": {
+        "success": "ส่งข้อมูลบัญชีรับเงินแล้ว",
+        "scheduleSuccess": "บันทึกกำหนดการโอนเงินแล้ว",
+        "scheduleRemoved": "ลบกำหนดการโอนเงินแล้ว",
+        "manualPayoutSuccess": "รันการโอนเงินสำเร็จ (สร้าง: {{created}}, ข้าม: {{skipped}}, ล้มเหลว: {{failed}})"
+      }
+    },
+    "transferSchedule": {
+      "title": "กำหนดการโอนเงิน",
+      "description": "ตั้งค่ากำหนดการโอนเงินอัตโนมัติ Omise สำหรับผู้รับเงินนี้",
+      "addButton": "เพิ่มกำหนดการโอนเงิน",
+      "editButton": "แก้ไขกำหนดการโอนเงิน",
+      "disabledHint": "สร้างบัญชีรับเงินก่อนเพิ่มกำหนดการโอนเงิน",
+      "currentSchedule": "กำหนดการปัจจุบัน",
+      "noSchedule": "ยังไม่มีกำหนดการ",
+      "rule": "กฎ",
+      "fixedAmount": "จำนวนเงินคงที่",
+      "percentageOfBalance": "เปอร์เซ็นต์ของยอดคงเหลือ",
+      "fullBalance": "โอนยอดคงเหลือทั้งหมด",
+      "modalTitleAdd": "เพิ่มกำหนดการโอนเงิน",
+      "modalTitleEdit": "แก้ไขกำหนดการโอนเงิน",
+      "modalDescription": "สร้างหรืออัปเดตกำหนดการโอนเงินอัตโนมัติ Omise",
+      "fields": {
+        "every": "ทุก",
+        "period": "ช่วงเวลา",
+        "day": "วัน",
+        "week": "สัปดาห์",
+        "month": "เดือน",
+        "startDate": "วันที่เริ่มต้น",
+        "endDate": "วันที่สิ้นสุด",
+        "monthRule": "กฎรายเดือน",
+        "fixedAmountLabel": "จำนวนเงินคงที่ (หน่วยย่อย, ไม่บังคับ)",
+        "fixedAmountPlaceholder": "เว้นว่างเพื่อโอนยอดทั้งหมด",
+        "percentageLabel": "เปอร์เซ็นต์ของยอดคงเหลือ (ไม่บังคับ)",
+        "percentagePlaceholder": "เช่น 75"
+      },
+      "footer": {
+        "cancel": "ยกเลิก",
+        "removeSchedule": "ลบกำหนดการ",
+        "approve": "อนุมัติกำหนดการโอนเงิน"
+      },
+      "confirm": {
+        "removeTitle": "ลบกำหนดการโอนเงิน?",
+        "removeDescription": "การดำเนินการนี้จะปิดใช้งานการโอนเงิน Omise อัตโนมัติสำหรับบัญชีรับเงินนี้",
+        "removeConfirm": "ลบกำหนดการ",
+        "approveScheduleTitle": "อนุมัติกำหนดการโอนเงิน?",
+        "approveScheduleDescription": "ตรวจสอบและยืนยันกำหนดการโอนเงินนี้ก่อนบันทึก",
+        "approveScheduleConfirm": "อนุมัติกำหนดการ",
+        "approveAccountTitleCreate": "อนุมัติบัญชีรับเงิน?",
+        "approveAccountTitleEdit": "อนุมัติการเปลี่ยนแปลงบัญชีรับเงิน?",
+        "approveAccountDescriptionCreate": "ตรวจสอบและยืนยันบัญชีรับเงินนี้ก่อนสร้าง",
+        "approveAccountDescriptionEdit": "ตรวจสอบและยืนยันการเปลี่ยนแปลงบัญชีรับเงินก่อนบันทึก",
+        "approveAccountConfirmCreate": "อนุมัติและสร้าง",
+        "approveAccountConfirmEdit": "อนุมัติและบันทึก",
+        "cancel": "ยกเลิก"
+      }
+    }
   }
 }
