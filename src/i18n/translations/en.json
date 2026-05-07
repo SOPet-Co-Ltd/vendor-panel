@@ -3098,5 +3098,137 @@
   },
   "brands": {
     "domain": "Brands"
+  },
+  "payoutAccount": {
+    "domain": "Payout account",
+    "header": {
+      "title": "Payout account",
+      "description": "Connect the bank account that Omise will use for vendor transfers.",
+      "notConnected": "Not connected",
+      "loading": "Loading"
+    },
+    "balance": {
+      "title": "Payout balance",
+      "description": "Sold amount, pending payout, and paid amount by currency.",
+      "sellerSold": "Seller sold",
+      "pending": "Pending",
+      "paid": "Paid",
+      "status": "Status"
+    },
+    "transactions": {
+      "title": "Payout transactions",
+      "description": "Recent payout transaction logs.",
+      "runPayout": "Run payout now",
+      "noData": "No payout transactions yet.",
+      "columns": {
+        "date": "Date",
+        "amount": "Amount",
+        "status": "Status",
+        "transactionId": "Transaction ID",
+        "detail": "Detail"
+      },
+      "expanded": {
+        "transferId": "Transfer ID:",
+        "updatedAt": "Updated at:",
+        "reason": "Reason:"
+      },
+      "actions": {
+        "view": "View",
+        "hide": "Hide"
+      }
+    },
+    "bankAccount": {
+      "title": "Bank account",
+      "accountName": "Account name",
+      "accountNumber": "Account number",
+      "omiseRecipientId": "Omise recipient ID",
+      "individualAccount": "Individual account",
+      "corporateAccount": "Corporate account"
+    },
+    "form": {
+      "createButton": "Create payout account",
+      "editButton": "Edit payout account",
+      "modalTitleCreate": "Create payout account",
+      "modalTitleEdit": "Edit payout account",
+      "modalDescription": "Review details and submit to continue approval.",
+      "fields": {
+        "recipientName": "Recipient name",
+        "recipientNamePlaceholder": "Enter recipient name",
+        "email": "Email",
+        "emailPlaceholder": "Enter email address",
+        "accountType": "Account type",
+        "individual": "Individual",
+        "corporation": "Corporation",
+        "taxId": "Tax ID",
+        "taxIdPlaceholder": "Enter tax ID",
+        "bankCode": "Bank code",
+        "bankCodePlaceholder": "Select Thai bank",
+        "bankAccountName": "Bank account name",
+        "bankAccountNamePlaceholder": "Enter bank account name",
+        "bankAccountNumber": "Bank account number",
+        "bankAccountNumberPlaceholder": "Enter bank account number"
+      },
+      "footer": {
+        "cancel": "Cancel",
+        "submitCreate": "Approve and create payout account",
+        "submitEdit": "Approve payout account changes"
+      },
+      "toast": {
+        "success": "Payout account submitted",
+        "scheduleSuccess": "Transfer schedule saved",
+        "scheduleRemoved": "Transfer schedule removed",
+        "manualPayoutSuccess": "Manual payout completed (created: {{created}}, skipped: {{skipped}}, failed: {{failed}})"
+      }
+    },
+    "transferSchedule": {
+      "title": "Transfer schedule",
+      "description": "Configure automatic Omise transfer schedule for this recipient.",
+      "addButton": "Add transfer schedule",
+      "editButton": "Edit transfer schedule",
+      "disabledHint": "Create a payout account before adding a transfer schedule.",
+      "currentSchedule": "Current schedule",
+      "noSchedule": "No schedule configured yet.",
+      "rule": "Rule",
+      "fixedAmount": "Fixed amount",
+      "percentageOfBalance": "Percentage of balance",
+      "fullBalance": "Transfer full available balance",
+      "modalTitleAdd": "Add transfer schedule",
+      "modalTitleEdit": "Edit transfer schedule",
+      "modalDescription": "Create or update the automatic transfer schedule for Omise payouts.",
+      "fields": {
+        "every": "Every",
+        "period": "Period",
+        "day": "Day",
+        "week": "Week",
+        "month": "Month",
+        "startDate": "Start date",
+        "endDate": "End date",
+        "monthRule": "Month rule",
+        "fixedAmountLabel": "Fixed amount (minor unit, optional)",
+        "fixedAmountPlaceholder": "Leave blank to transfer balance",
+        "percentageLabel": "Percentage of balance (optional)",
+        "percentagePlaceholder": "e.g. 75"
+      },
+      "footer": {
+        "cancel": "Cancel",
+        "removeSchedule": "Remove schedule",
+        "approve": "Approve transfer schedule"
+      },
+      "confirm": {
+        "removeTitle": "Remove transfer schedule?",
+        "removeDescription": "This disables automatic Omise transfers for this payout account.",
+        "removeConfirm": "Remove schedule",
+        "approveScheduleTitle": "Approve transfer schedule?",
+        "approveScheduleDescription": "Review and confirm this transfer schedule before saving it.",
+        "approveScheduleConfirm": "Approve schedule",
+        "approveAccountTitleCreate": "Approve payout account?",
+        "approveAccountTitleEdit": "Approve payout account changes?",
+        "approveAccountDescriptionCreate": "Review and confirm this payout account before creating it.",
+        "approveAccountDescriptionEdit": "Review and confirm these payout account changes before saving them.",
+        "approveAccountConfirmCreate": "Approve and create",
+        "approveAccountConfirmEdit": "Approve and save",
+        "cancel": "Cancel"
+      }
+    }
   }
 }

@@ -199,7 +199,7 @@ export const fetchQuery = async (
       };
     }
 
-    throw new Error(errorData.message || 'Server error');
+    throw new Error(errorData.message || errorData.error || 'Server error');
   }
 
   if (response.status === 204) {

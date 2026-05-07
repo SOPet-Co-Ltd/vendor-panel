@@ -29,6 +29,10 @@ const useSettingRoutes = (): INavItem[] => {
         to: '/settings/store'
       },
       {
+        label: 'Payout account',
+        to: '/settings/payout-account'
+      },
+      {
         label: 'Team',
         to: '/settings/users'
       },
