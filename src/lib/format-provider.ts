@@ -2,7 +2,7 @@
  * Providers only have an ID to identify them. This function formats the ID
  * into a human-readable string.
  *
- * Format example: pp_stripe-blik_dkk
+ * Format example: pp_card_omise
  *
  * @param id - The ID of the provider
  * @returns A formatted string
