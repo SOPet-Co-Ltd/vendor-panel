@@ -102,6 +102,7 @@ export const CreatePromotionForm = () => {
       const {
         target_rules: targetRulesData = [],
         buy_rules: buyRulesData = [],
+        currency_code: _currencyCode,
         ...applicationMethodData
       } = application_method;
 
@@ -143,8 +144,7 @@ export const CreatePromotionForm = () => {
           application_method: {
             ...applicationMethodData,
             ...applicationMethodRuleData,
-            target_rules: buildRulesData(targetRulesData),
-            buy_rules: buildRulesData(buyRulesData)
+            target_rules: buildRulesData(targetRulesData)
           },
           is_automatic: is_automatic === 'true'
         },
@@ -801,19 +801,29 @@ export const CreatePromotionForm = () => {
                                   {...field}
                                   onValueChange={field.onChange}
                                 >
-                                  <RadioGroup.ChoiceBox
-                                    value={'each'}
-                                    label={t('promotions.form.allocation.each.title')}
-                                    description={t('promotions.form.allocation.each.description')}
-                                    className={clx('basis-1/2')}
-                                  />
+                                  {!currentTemplate?.hiddenFields?.includes(
+                                    'application_method.allocation.each'
+                                  ) && (
+                                    <RadioGroup.ChoiceBox
+                                      value={'each'}
+                                      label={t('promotions.form.allocation.each.title')}
+                                      description={t('promotions.form.allocation.each.description')}
+                                      className={clx('basis-1/2')}
+                                    />
+                                  )}
 
-                                  <RadioGroup.ChoiceBox
-                                    value={'across'}
-                                    label={t('promotions.form.allocation.across.title')}
-                                    description={t('promotions.form.allocation.across.description')}
-                                    className={clx('basis-1/2')}
-                                  />
+                                  {!currentTemplate?.hiddenFields?.includes(
+                                    'application_method.allocation.across'
+                                  ) && (
+                                    <RadioGroup.ChoiceBox
+                                      value={'across'}
+                                      label={t('promotions.form.allocation.across.title')}
+                                      description={t(
+                                        'promotions.form.allocation.across.description'
+                                      )}
+                                      className={clx('basis-1/2')}
+                                    />
+                                  )}
                                 </RadioGroup>
                               </Form.Control>
                               <Form.ErrorMessage />
