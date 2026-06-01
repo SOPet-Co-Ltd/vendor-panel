@@ -16,8 +16,8 @@ jobs:
 
       - name: Trigger Vercel deploy (main)
         if: github.ref == 'refs/heads/main' && steps.author.outputs.email != 'thapecroth@gmail.com'
-        run: wget -qO- 'https://api.vercel.com/v1/integrations/deploy/prj_ntC6duOzHwaJupAUjWUg1GI0PAUM/tgWTvl6XT6'
+        run: wget -qO- 'https://api.vercel.com/v1/integrations/deploy/prj_ADYF3RPQ3NKMVDzC0g8uG6zktXGM/IAHo9UTXbe'
 
       - name: Trigger Vercel deploy (uat)
         if: github.ref == 'refs/heads/uat' && steps.author.outputs.email != 'thapecroth@gmail.com'
-        run: wget -qO- 'https://api.vercel.com/v1/integrations/deploy/prj_ntC6duOzHwaJupAUjWUg1GI0PAUM/gp80dM76xA'
+        run: wget -qO- 'https://api.vercel.com/v1/integrations/deploy/prj_ADYF3RPQ3NKMVDzC0g8uG6zktXGM/9Grcq8gqJi'
