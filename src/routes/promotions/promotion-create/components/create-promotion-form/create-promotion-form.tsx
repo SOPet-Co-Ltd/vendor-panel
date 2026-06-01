@@ -24,7 +24,7 @@ import {
   Text,
   toast
 } from '@medusajs/ui';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch, type Path, type PathValue } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
@@ -39,7 +39,7 @@ import { DEFAULT_CAMPAIGN_VALUES } from '../../../../campaigns/common/constants'
 import { RulesFormField } from '../../../common/edit-rules/components/rules-form-field';
 import { AddCampaignPromotionFields } from '../../../promotion-add-campaign/components/add-campaign-promotion-form';
 import { Tab } from './constants';
-import { CreatePromotionSchema } from './form-schema';
+import { CreatePromotionSchema, type CreatePromotionSchemaType } from './form-schema';
 import { templates } from './templates';
 
 const defaultValues = {
@@ -102,6 +102,7 @@ export const CreatePromotionForm = () => {
       const {
         target_rules: targetRulesData = [],
         buy_rules: buyRulesData = [],
+        currency_code: _currencyCode,
         ...applicationMethodData
       } = application_method;
 
@@ -143,8 +144,7 @@ export const CreatePromotionForm = () => {
           application_method: {
             ...applicationMethodData,
             ...applicationMethodRuleData,
-            target_rules: buildRulesData(targetRulesData),
-            buy_rules: buildRulesData(buyRulesData)
+            target_rules: buildRulesData(targetRulesData)
           },
           is_automatic: is_automatic === 'true'
         },
@@ -251,9 +251,12 @@ export const CreatePromotionForm = () => {
     name: 'template_id'
   });
 
-  const currentTemplate = useMemo(() => {
-    const currentTemplate = templates.find(template => template.id === watchTemplateId);
+  const currentTemplate = useMemo(
+    () => templates.find(template => template.id === watchTemplateId),
+    [watchTemplateId]
+  );
 
+  useEffect(() => {
     if (!currentTemplate) {
       return;
     }
@@ -264,17 +267,17 @@ export const CreatePromotionForm = () => {
     });
 
     for (const [key, value] of Object.entries(currentTemplate.defaults)) {
-      if (typeof value === 'object') {
+      if (typeof value === 'object' && value !== null) {
         for (const [subKey, subValue] of Object.entries(value)) {
-          setValue(`application_method.${subKey}` as keyof typeof defaultValues, subValue as never);
+          const path = `application_method.${subKey}` as Path<CreatePromotionSchemaType>;
+          setValue(path, subValue as PathValue<CreatePromotionSchemaType, typeof path>);
         }
       } else {
-        setValue(key as keyof typeof defaultValues, value);
+        const path = key as Path<CreatePromotionSchemaType>;
+        setValue(path, value as PathValue<CreatePromotionSchemaType, typeof path>);
       }
     }
-
-    return currentTemplate;
-  }, [watchTemplateId, setValue, reset]);
+  }, [watchTemplateId, currentTemplate, setValue, reset]);
 
   const watchValueType = useWatch({
     control: form.control,
@@ -356,17 +359,20 @@ export const CreatePromotionForm = () => {
     name: 'rules'
   });
 
-  const watchCurrencyRule = watchRules.find(rule => rule.attribute === 'currency_code');
+  useEffect(() => {
+    const currencyRule = watchRules?.find(rule => rule.attribute === 'currency_code');
+    const currencyCode = form.getValues('application_method.currency_code');
 
-  if (watchCurrencyRule) {
-    const formData = form.getValues();
-    const currencyCode = formData.application_method.currency_code;
-    const ruleValue = watchCurrencyRule.values;
+    if (currencyRule) {
+      const ruleValue = currencyRule.values;
 
-    if (!Array.isArray(ruleValue) && currencyCode !== ruleValue) {
-      form.setValue('application_method.currency_code', ruleValue as string);
+      if (!Array.isArray(ruleValue) && currencyCode !== ruleValue) {
+        form.setValue('application_method.currency_code', ruleValue as string);
+      }
+    } else if (currencyCode) {
+      form.setValue('application_method.currency_code', undefined);
     }
-  }
+  }, [watchRules, form]);
 
   return (
     <RouteFocusModal.Form form={form}>
@@ -801,19 +807,29 @@ export const CreatePromotionForm = () => {
                                   {...field}
                                   onValueChange={field.onChange}
                                 >
-                                  <RadioGroup.ChoiceBox
-                                    value={'each'}
-                                    label={t('promotions.form.allocation.each.title')}
-                                    description={t('promotions.form.allocation.each.description')}
-                                    className={clx('basis-1/2')}
-                                  />
+                                  {!currentTemplate?.hiddenFields?.includes(
+                                    'application_method.allocation.each'
+                                  ) && (
+                                    <RadioGroup.ChoiceBox
+                                      value={'each'}
+                                      label={t('promotions.form.allocation.each.title')}
+                                      description={t('promotions.form.allocation.each.description')}
+                                      className={clx('basis-1/2')}
+                                    />
+                                  )}
 
-                                  <RadioGroup.ChoiceBox
-                                    value={'across'}
-                                    label={t('promotions.form.allocation.across.title')}
-                                    description={t('promotions.form.allocation.across.description')}
-                                    className={clx('basis-1/2')}
-                                  />
+                                  {!currentTemplate?.hiddenFields?.includes(
+                                    'application_method.allocation.across'
+                                  ) && (
+                                    <RadioGroup.ChoiceBox
+                                      value={'across'}
+                                      label={t('promotions.form.allocation.across.title')}
+                                      description={t(
+                                        'promotions.form.allocation.across.description'
+                                      )}
+                                      className={clx('basis-1/2')}
+                                    />
+                                  )}
                                 </RadioGroup>
                               </Form.Control>
                               <Form.ErrorMessage />

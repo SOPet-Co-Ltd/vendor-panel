@@ -12,10 +12,7 @@ import { KeyboundForm } from '../../../../../components/utilities/keybound-form'
 import { useUpdateShippingOptions } from '../../../../../hooks/api/shipping-options';
 import { useComboboxData } from '../../../../../hooks/use-combobox-data';
 import { fetchQuery } from '../../../../../lib/client';
-import {
-  getShippingProfileName,
-  isOptionEnabledInStore
-} from '../../../../../lib/shipping-options';
+import { isOptionEnabledInStore } from '../../../../../lib/shipping-options';
 import { FulfillmentSetType, ShippingOptionPriceType } from '../../../common/constants';
 
 type EditShippingOptionFormProps = {
@@ -42,18 +39,20 @@ export const EditShippingOptionForm = ({
   const isPickup = type === FulfillmentSetType.Pickup;
 
   const shippingProfiles = useComboboxData({
-    queryFn: async () => {
-      const { shipping_profiles } = await fetchQuery('/vendor/shipping-profiles', {
-        method: 'GET'
-      });
-      return shipping_profiles;
-    },
+    queryFn: (params: { q?: string; limit?: number; offset?: number }) =>
+      fetchQuery(`/vendor/shipping-profiles`, {
+        method: 'GET',
+        query: params as Record<string, string | number | object>
+      }),
     queryKey: ['shipping_profiles_edit_shipping_option'],
     getOptions: data =>
-      data?.map((profile: any) => ({
-        label: getShippingProfileName(profile.shipping_profile.name),
-        value: profile.shipping_profile.id
-      })),
+      (data.shipping_profiles || [])
+        .map((profile: any) => profile?.shipping_profile ?? profile)
+        .filter((sp: any) => sp != null && sp.id != null)
+        .map((sp: any) => ({
+          label: sp.name?.includes(':') ? sp.name.split(':')[1] : (sp.name ?? ''),
+          value: sp.id
+        })),
     defaultValue: shippingOption.shipping_profile_id
   });
 

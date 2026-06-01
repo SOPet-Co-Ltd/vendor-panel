@@ -55,9 +55,12 @@ export const EditPromotionDetailsForm = ({ promotion }: EditPromotionFormProps) 
         code: data.code,
         status: data.status,
         application_method: {
-          type: data.value_type,
           value: data.value,
-          max_quantity: data.max_quantity
+          type: data.value_type,
+          max_quantity: data.max_quantity,
+          allocation: promotion.application_method?.allocation,
+          target_type: promotion.application_method!.target_type,
+          currency_code: promotion.application_method?.currency_code
         }
       },
       {
