@@ -2,5 +2,8 @@
   "buildCommand": "yarn build:preview",
   "outputDirectory": "dist",
   "framework": null,
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }],
+  "git": {
+    "deploymentEnabled": false
+  }
 }
