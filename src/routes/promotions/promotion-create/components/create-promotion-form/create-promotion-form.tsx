@@ -92,7 +92,6 @@ export const CreatePromotionForm = () => {
 
       const {
         campaign_choice: _campaignChoice,
-        is_automatic,
         template_id: _templateId,
         application_method,
         rules,
@@ -146,7 +145,7 @@ export const CreatePromotionForm = () => {
             ...applicationMethodRuleData,
             target_rules: buildRulesData(targetRulesData)
           },
-          is_automatic: is_automatic === 'true'
+          is_automatic: false
         },
         {
           onSuccess: ({ promotion }) => {
@@ -493,42 +492,6 @@ export const CreatePromotionForm = () => {
                       {form.formState.errors.root.message}
                     </Alert>
                   )}
-
-                  <Form.Field
-                    control={form.control}
-                    name="is_automatic"
-                    render={({ field }) => {
-                      return (
-                        <Form.Item>
-                          <Form.Label>{t('promotions.form.method.label')}</Form.Label>
-
-                          <Form.Control>
-                            <RadioGroup
-                              className="flex gap-y-3"
-                              {...field}
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
-                              <RadioGroup.ChoiceBox
-                                value={'false'}
-                                label={t('promotions.form.method.code.title')}
-                                description={t('promotions.form.method.code.description')}
-                                className={clx('basis-1/2')}
-                              />
-
-                              <RadioGroup.ChoiceBox
-                                value={'true'}
-                                label={t('promotions.form.method.automatic.title')}
-                                description={t('promotions.form.method.automatic.description')}
-                                className={clx('basis-1/2')}
-                              />
-                            </RadioGroup>
-                          </Form.Control>
-                          <Form.ErrorMessage />
-                        </Form.Item>
-                      );
-                    }}
-                  />
 
                   <Form.Field
                     control={form.control}
