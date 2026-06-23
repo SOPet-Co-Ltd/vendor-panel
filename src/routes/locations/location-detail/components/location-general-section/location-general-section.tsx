@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { ActionMenu } from '../../../../../components/common/action-menu';
+import DisplayId from '../../../../../components/common/display-id/display-id';
 import { NoRecords } from '../../../../../components/common/empty-table-content';
 import { IconAvatar } from '../../../../../components/common/icon-avatar';
 import { LinkButton } from '../../../../../components/common/link-button';
@@ -59,6 +60,9 @@ export const LocationGeneralSection = ({ location }: LocationGeneralSectionProps
         <div className="flex items-center justify-between px-6 py-4">
           <div>
             <Heading>{location.name}</Heading>
+            <Text className="txt-small font-mono text-ui-fg-subtle">
+              <DisplayId id={location.id} />
+            </Text>
             <Text className="txt-small text-ui-fg-subtle">
               {getFormattedAddress({
                 address: location.address
