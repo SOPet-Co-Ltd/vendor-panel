@@ -7,6 +7,9 @@ import { useStore } from '../../../hooks/api/store.tsx';
 import { useMe } from '../../../hooks/api/users.tsx';
 import { CompanySection } from './components/company-section/company-section.tsx';
 import { StoreGeneralSection } from './components/store-general-section/index.ts';
+import { StoreIdSection } from './components/store-id-section/index.ts';
+import { StoreIntegrationSection } from './components/store-integration-section/index.ts';
+import { StoreLocationsSection } from './components/store-locations-section/index.ts';
 import { storeLoader } from './loader.ts';
 
 export const StoreDetail = () => {
@@ -21,7 +24,7 @@ export const StoreDetail = () => {
   const { getWidgets } = useDashboardExtension();
 
   if (isPending || sellerPending || !store || !seller) {
-    return <SingleColumnPageSkeleton sections={2} />;
+    return <SingleColumnPageSkeleton sections={5} />;
   }
 
   if (isError || sellerError) {
@@ -38,6 +41,9 @@ export const StoreDetail = () => {
       hasOutlet
     >
       <StoreGeneralSection seller={seller} />
+      <StoreIdSection seller={seller} />
+      <StoreIntegrationSection seller={seller} />
+      <StoreLocationsSection />
       <CompanySection seller={seller} />
     </SingleColumnPage>
   );

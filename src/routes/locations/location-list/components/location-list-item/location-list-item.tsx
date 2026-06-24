@@ -4,6 +4,7 @@ import { Container, StatusBadge, Text, toast, usePrompt } from '@medusajs/ui';
 import { useTranslation } from 'react-i18next';
 
 import { ActionMenu } from '../../../../../components/common/action-menu';
+import DisplayId from '../../../../../components/common/display-id/display-id';
 // import { BadgeListSummary } from "../../../../../components/common/badge-list-summary"
 import { LinkButton } from '../../../../../components/common/link-button';
 import { useDeleteStockLocation } from '../../../../../hooks/api/stock-locations';
@@ -129,6 +130,9 @@ function LocationListItem(props: LocationProps) {
 
           <div className="grow-1 flex flex-1 flex-col">
             <Text weight="plus">{location.name}</Text>
+            <Text className="txt-small font-mono text-ui-fg-subtle">
+              <DisplayId id={location.id} />
+            </Text>
             <Text className="txt-small text-ui-fg-subtle">
               {getFormattedAddress({
                 address: location.address
