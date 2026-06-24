@@ -1,27 +1,49 @@
 import { Heading } from '@medusajs/ui';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useLoaderData, useParams, useSearchParams } from 'react-router-dom';
 
 import { RouteDrawer } from '../../../components/modals';
-import { useProduct } from '../../../hooks/api/products';
+import { useProduct, useProductVariant } from '../../../hooks/api/products';
 import { ProductEditVariantForm } from './components/product-edit-variant-form';
+import { editProductVariantLoader } from './loader';
 
 export const ProductVariantEdit = () => {
+  const initialData = useLoaderData() as Awaited<ReturnType<typeof editProductVariantLoader>>;
+
   const { t } = useTranslation();
   const { id, variant_id } = useParams();
+  const [searchParams] = useSearchParams();
+  const searchVariantId = searchParams.get('variant_id');
+
+  const { variant, isPending, isError, error } = useProductVariant(
+    id!,
+    variant_id || searchVariantId!,
+    undefined,
+    {
+      initialData
+    }
+  );
 
   const {
     product,
     isPending: isProductPending,
     isError: isProductError,
     error: productError
-  } = useProduct(id!, {
-    fields: '*variants'
-  });
+  } = useProduct(
+    variant?.product_id!,
+    {
+      fields: '-variants'
+    },
+    {
+      enabled: !!variant?.product_id
+    }
+  );
 
-  const variant = product?.variants?.find(variant => variant.id === variant_id);
+  const ready = !isPending && !!variant && !isProductPending && !!product;
 
-  const ready = !isProductPending && !!product;
+  if (isError) {
+    throw error;
+  }
 
   if (isProductError) {
     throw productError;

@@ -1,4 +1,5 @@
-import { Button, Input, Text, Textarea, toast } from '@medusajs/ui';
+import { HttpTypes } from '@medusajs/types';
+import { Button, Input, Select, Text, Textarea, toast } from '@medusajs/ui';
 import { useTranslation } from 'react-i18next';
 import * as zod from 'zod';
 
@@ -15,16 +16,66 @@ type EditProductFormProps = {
   product: ExtendedAdminProduct;
 };
 
+const VENDOR_PRODUCT_STATUSES = ['draft', 'proposed', 'published'] as const;
+type VendorProductStatus = (typeof VENDOR_PRODUCT_STATUSES)[number];
+
+const STATUS_PROMOTION: Record<string, VendorProductStatus | null> = {
+  draft: 'proposed',
+  proposed: 'published',
+  rejected: 'proposed'
+};
+
+const getNextVendorProductStatus = (
+  currentStatus: HttpTypes.AdminProductStatus
+): VendorProductStatus | null => {
+  return STATUS_PROMOTION[currentStatus] ?? null;
+};
+
+const getSelectableVendorStatuses = (
+  currentStatus: HttpTypes.AdminProductStatus
+): VendorProductStatus[] => {
+  const nextStatus = getNextVendorProductStatus(currentStatus);
+
+  if (currentStatus === 'rejected') {
+    return nextStatus ? [nextStatus] : [];
+  }
+
+  const normalizedStatus = VENDOR_PRODUCT_STATUSES.includes(currentStatus as VendorProductStatus)
+    ? (currentStatus as VendorProductStatus)
+    : 'draft';
+
+  if (!nextStatus) {
+    return [normalizedStatus];
+  }
+
+  return [normalizedStatus, nextStatus];
+};
+
 const EditProductSchema = zod.object({
+  status: zod.enum(VENDOR_PRODUCT_STATUSES),
   title: zod.string().min(1),
   handle: zod.string().min(1),
   description: zod.string().optional(),
   discountable: zod.boolean()
 });
 
+const getDefaultProductStatus = (
+  currentStatus: HttpTypes.AdminProductStatus,
+  selectableStatuses: VendorProductStatus[]
+): VendorProductStatus => {
+  if (selectableStatuses.includes(currentStatus as VendorProductStatus)) {
+    return currentStatus as VendorProductStatus;
+  }
+
+  return selectableStatuses[0] ?? 'draft';
+};
+
 export const EditProductForm = ({ product }: EditProductFormProps) => {
   const { t } = useTranslation();
   const { handleSuccess } = useRouteModal();
+  const selectableStatuses = getSelectableVendorStatuses(product.status);
+  const canPromoteStatus =
+    getNextVendorProductStatus(product.status) !== null && product.status !== 'published';
 
   const { getFormFields, getFormConfigs } = useDashboardExtension();
   const fields = getFormFields('product', 'edit');
@@ -32,6 +83,7 @@ export const EditProductForm = ({ product }: EditProductFormProps) => {
 
   const form = useExtendableForm({
     defaultValues: {
+      status: getDefaultProductStatus(product.status, selectableStatuses),
       title: product.title,
       handle: product.handle || '',
       description: product.description || '',
@@ -45,13 +97,16 @@ export const EditProductForm = ({ product }: EditProductFormProps) => {
   const { mutateAsync, isPending } = useUpdateProduct(product.id);
 
   const handleSubmit = form.handleSubmit(async data => {
-    const { description, discountable, handle, title } = data;
+    const { description, discountable, handle, status, title } = data;
+    const shouldUpdateStatus =
+      status !== product.status && getNextVendorProductStatus(product.status) === status;
 
     await mutateAsync(
       {
         description,
         discountable,
         handle,
+        ...(shouldUpdateStatus ? { status: status as HttpTypes.AdminProductStatus } : {}),
         title
       },
       {
@@ -79,41 +134,52 @@ export const EditProductForm = ({ product }: EditProductFormProps) => {
         <RouteDrawer.Body className="flex flex-1 flex-col gap-y-8 overflow-y-auto">
           <div className="flex flex-col gap-y-8">
             <div className="flex flex-col gap-y-4">
-              {/* <Form.Field
-                control={form.control}
-                name="status"
-                render={({ field: { onChange, ref, ...field } }) => {
-                  return (
-                    <Form.Item>
-                      <Form.Label>{t("fields.status")}</Form.Label>
-                      <Form.Control>
-                        <Select {...field} onValueChange={onChange}>
-                          <Select.Trigger ref={ref}>
-                            <Select.Value />
-                          </Select.Trigger>
-                          <Select.Content>
-                            {(
-                              [
-                                "draft",
-                                "published",
-                                "proposed",
-                                "rejected",
-                              ] as const
-                            ).map((status) => {
-                              return (
-                                <Select.Item key={status} value={status}>
-                                  {t(`products.productStatus.${status}`)}
-                                </Select.Item>
-                              )
-                            })}
-                          </Select.Content>
-                        </Select>
-                      </Form.Control>
-                      <Form.ErrorMessage />
-                    </Form.Item>
-                  )
-                }}
-              /> */}
+              {canPromoteStatus ? (
+                <Form.Field
+                  control={form.control}
+                  name="status"
+                  render={({ field: { onChange, ref, ...field } }) => {
+                    return (
+                      <Form.Item>
+                        <Form.Label>{t('fields.status')}</Form.Label>
+                        <Form.Control>
+                          <Select
+                            {...field}
+                            onValueChange={onChange}
+                          >
+                            <Select.Trigger ref={ref}>
+                              <Select.Value />
+                            </Select.Trigger>
+                            <Select.Content>
+                              {selectableStatuses.map(status => {
+                                return (
+                                  <Select.Item
+                                    key={status}
+                                    value={status}
+                                  >
+                                    {t(`products.productStatus.${status}`)}
+                                  </Select.Item>
+                                );
+                              })}
+                            </Select.Content>
+                          </Select>
+                        </Form.Control>
+                        <Form.ErrorMessage />
+                      </Form.Item>
+                    );
+                  }}
+                />
+              ) : (
+                <Form.Item>
+                  <Form.Label>{t('fields.status')}</Form.Label>
+                  <Form.Control>
+                    <Input
+                      disabled
+                      value={t(`products.productStatus.${product.status}`)}
+                    />
+                  </Form.Control>
+                </Form.Item>
+              )}
               <Form.Field
                 control={form.control}
                 name="title"

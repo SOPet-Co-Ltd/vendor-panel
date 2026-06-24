@@ -19,7 +19,7 @@ import { ExtendedAdminProduct, ExtendedAdminProductVariant } from '../../../../.
 
 type ProductEditVariantFormProps = {
   product: ExtendedAdminProduct;
-  variant?: ExtendedAdminProductVariant;
+  variant: ExtendedAdminProductVariant;
 };
 
 const ProductEditVariantSchema = z.object({
@@ -46,34 +46,34 @@ export const ProductEditVariantForm = ({ variant, product }: ProductEditVariantF
   const { t } = useTranslation();
   const { handleSuccess } = useRouteModal();
   const defaultOptions = product.options?.reduce((acc: any, option: any) => {
-    const varOpt = variant?.options?.find((o: any) => o.option_id === option.id);
+    const varOpt = variant.options?.find((o: any) => o.option_id === option.id);
     acc[option.title] = varOpt?.value;
     return acc;
   }, {});
 
   const form = useForm<z.infer<typeof ProductEditVariantSchema>>({
     defaultValues: {
-      title: variant?.title || '',
-      material: variant?.material || '',
-      sku: variant?.sku || undefined,
-      ean: variant?.ean || '',
-      upc: variant?.upc || '',
-      barcode: variant?.barcode || '',
-      manage_inventory: true,
-      allow_backorder: true,
-      weight: variant?.weight || '',
-      height: variant?.height || '',
-      width: variant?.width || '',
-      length: variant?.length || '',
-      mid_code: variant?.mid_code || '',
-      hs_code: variant?.hs_code || '',
-      origin_country: variant?.origin_country || '',
+      title: variant.title || '',
+      material: variant.material || '',
+      sku: variant.sku || '',
+      ean: variant.ean || '',
+      upc: variant.upc || '',
+      barcode: variant.barcode || '',
+      manage_inventory: variant.manage_inventory || false,
+      allow_backorder: variant.allow_backorder || false,
+      weight: variant.weight || '',
+      height: variant.height || '',
+      width: variant.width || '',
+      length: variant.length || '',
+      mid_code: variant.mid_code || '',
+      hs_code: variant.hs_code || '',
+      origin_country: variant.origin_country || '',
       options: defaultOptions
     },
     resolver: zodResolver(ProductEditVariantSchema)
   });
 
-  const { mutateAsync, isPending } = useUpdateProductVariant(variant?.product_id!, variant?.id!);
+  const { mutateAsync, isPending } = useUpdateProductVariant(variant.product_id!, variant.id);
 
   const handleSubmit = form.handleSubmit(async data => {
     const {

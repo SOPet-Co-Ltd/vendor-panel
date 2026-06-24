@@ -463,12 +463,30 @@ export const useUpdateProduct = (
 ) => {
   return useMutation({
     mutationFn: async payload => {
-      return fetchQuery(`/vendor/products/${id}`, {
-        method: 'POST',
-        body: {
-          ...payload
-        }
-      });
+      const { status, ...rest } = payload;
+      const hasOtherFields = Object.keys(rest).length > 0;
+
+      let result: HttpTypes.AdminProductResponse | undefined;
+
+      if (hasOtherFields) {
+        result = await fetchQuery(`/vendor/products/${id}`, {
+          method: 'POST',
+          body: rest
+        });
+      }
+
+      if (status !== undefined) {
+        result = await fetchQuery(`/vendor/products/${id}/status`, {
+          method: 'POST',
+          body: { status }
+        });
+      }
+
+      if (!result) {
+        throw new Error('No product fields to update');
+      }
+
+      return result;
     },
     onSuccess: async (data, variables, context) => {
       await queryClient.invalidateQueries({
