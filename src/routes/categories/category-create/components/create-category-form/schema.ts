@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const CreateCategoryDetailsSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().trim().min(1, 'Title is required'),
   description: z.string().optional(),
   handle: z.string().optional(),
   status: z.enum(['active', 'inactive']),
