@@ -1,9 +1,16 @@
+import { useMemo } from 'react';
+
 import { useLoaderData, useParams } from 'react-router-dom';
 
 import { TwoColumnPageSkeleton } from '../../../components/common/skeleton';
 import { TwoColumnPage } from '../../../components/layout/pages';
 import { useDashboardExtension } from '../../../extensions';
 import { useOrder } from '../../../hooks/api/orders';
+import { useMe } from '../../../hooks/api/users';
+import {
+  useSellerScopedOrder,
+  useSellerShippingOptionIds
+} from '../../../hooks/use-seller-scoped-order';
 import { OrderCustomerSection } from './components/order-customer-section';
 import { OrderFulfillmentSection } from './components/order-fulfillment-section';
 import { OrderGeneralSection } from './components/order-general-section';
@@ -17,6 +24,8 @@ export const OrderDetail = () => {
 
   const { id } = useParams();
   const { getWidgets } = useDashboardExtension();
+  const { seller, isLoading: isSellerLoading } = useMe();
+  const sellerShippingOptionIds = useSellerShippingOptionIds();
 
   const { order, isLoading, isError, error } = useOrder(
     id!,
@@ -28,22 +37,30 @@ export const OrderDetail = () => {
     }
   );
 
-  // TODO: Retrieve endpoints don't have an order ability, so a JS sort until this is available
-  if (order) {
-    order.items = order.items.sort((itemA: any, itemB: any) => {
-      if (itemA.created_at > itemB.created_at) {
-        return 1;
-      }
+  const sellerScopedOrder = useSellerScopedOrder(order, seller?.id, sellerShippingOptionIds);
 
-      if (itemA.created_at < itemB.created_at) {
-        return -1;
-      }
+  const sortedSellerScopedOrder = useMemo(() => {
+    if (!sellerScopedOrder) {
+      return sellerScopedOrder;
+    }
 
-      return 0;
-    });
-  }
+    return {
+      ...sellerScopedOrder,
+      items: [...sellerScopedOrder.items].sort((itemA, itemB) => {
+        if (itemA.created_at > itemB.created_at) {
+          return 1;
+        }
 
-  if (isLoading || !order) {
+        if (itemA.created_at < itemB.created_at) {
+          return -1;
+        }
+
+        return 0;
+      })
+    };
+  }, [sellerScopedOrder]);
+
+  if (isLoading || isSellerLoading || !order || sortedSellerScopedOrder === undefined) {
     return (
       <TwoColumnPageSkeleton
         mainSections={4}
@@ -57,6 +74,10 @@ export const OrderDetail = () => {
     throw error;
   }
 
+  if (sortedSellerScopedOrder === null) {
+    throw new Response('Order not found', { status: 404 });
+  }
+
   return (
     <TwoColumnPage
       widgets={{
@@ -65,17 +86,17 @@ export const OrderDetail = () => {
         sideAfter: getWidgets('order.details.side.after'),
         sideBefore: getWidgets('order.details.side.before')
       }}
-      data={order}
+      data={sortedSellerScopedOrder}
       hasOutlet
     >
       <TwoColumnPage.Main>
-        <OrderGeneralSection order={order} />
-        <OrderSummarySection order={order} />
-        <OrderPaymentSection order={order} />
-        <OrderFulfillmentSection order={order} />
+        <OrderGeneralSection order={sortedSellerScopedOrder} />
+        <OrderSummarySection order={sortedSellerScopedOrder} />
+        <OrderPaymentSection order={sortedSellerScopedOrder} />
+        <OrderFulfillmentSection order={sortedSellerScopedOrder} />
       </TwoColumnPage.Main>
       <TwoColumnPage.Sidebar>
-        <OrderCustomerSection order={order} />
+        <OrderCustomerSection order={sortedSellerScopedOrder} />
         {/* TODO: Uncomment when API returns data about payment cancel/capture/refund dates + when section is adapted to the changes */}
         {/* <OrderActivitySection order={order} /> */}
       </TwoColumnPage.Sidebar>

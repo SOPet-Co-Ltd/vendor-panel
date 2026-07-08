@@ -4,10 +4,15 @@ import { useSearchParams } from 'react-router-dom';
 
 import { _DataTable } from '../../../../../components/table/data-table/data-table';
 import { useOrders } from '../../../../../hooks/api/orders';
+import { useMe } from '../../../../../hooks/api/users';
 import { useOrderTableColumns } from '../../../../../hooks/table/columns/use-order-table-columns';
 import { useOrderTableFilters } from '../../../../../hooks/table/filters';
 import { useOrderTableQuery } from '../../../../../hooks/table/query/use-order-table-query';
 import { useDataTable } from '../../../../../hooks/use-data-table';
+import {
+  useSellerScopedOrders,
+  useSellerShippingOptionIds
+} from '../../../../../hooks/use-seller-scoped-order';
 
 const PAGE_SIZE = 10;
 
@@ -20,9 +25,13 @@ export const OrderListTable = () => {
   const [params] = useSearchParams();
   const order_status = params.get('order_status') || '';
 
+  const { seller } = useMe();
+  const sellerShippingOptionIds = useSellerShippingOptionIds();
+
   const { orders, count, isError, error, isLoading } = useOrders(
     {
-      fields: '*customer,+payment_status,*split_order_payment'
+      fields:
+        '*customer,+payment_status,*split_order_payment,*shipping_methods,*items,*items.variant,*items.variant.product,*items.variant.product.seller'
     },
     undefined,
     {
@@ -33,10 +42,13 @@ export const OrderListTable = () => {
     }
   );
 
+  const sellerScopedOrders = useSellerScopedOrders(orders, seller?.id, sellerShippingOptionIds);
+
   const offset = searchParams.offset || 0;
 
-  const processedOrders = orders?.slice(offset, offset + PAGE_SIZE);
-  const processedCount = count < orders?.length ? count : orders?.length || 0;
+  const processedOrders = sellerScopedOrders?.slice(offset, offset + PAGE_SIZE);
+  const processedCount =
+    count < (sellerScopedOrders?.length ?? 0) ? count : sellerScopedOrders?.length || 0;
 
   const columns = useOrderTableColumns({});
   const filters = useOrderTableFilters();
