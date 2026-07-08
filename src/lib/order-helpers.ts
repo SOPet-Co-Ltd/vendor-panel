@@ -28,18 +28,23 @@ export const getOrderStatus = (
 };
 
 export const getOrderPaymentStatus = (t: TFunction<'translation'>, status: string) => {
-  const [label, color] = {
+  const statusMap: Record<string, [string, 'red' | 'orange' | 'green']> = {
+    not_paid: [t('orders.payment.status.notPaid'), 'red'],
     pending: [t('orders.status.pending'), 'red'],
     authorized: [t('orders.payment.status.authorized'), 'orange'],
     partially_authorized: [t('orders.payment.status.partiallyAuthorized'), 'red'],
     awaiting: [t('orders.payment.status.awaiting'), 'orange'],
-    captured: ['Payment Captured', 'green'],
+    captured: [t('orders.payment.status.captured'), 'green'],
+    completed: [t('orders.payment.status.captured'), 'green'],
     refunded: [t('orders.payment.status.refunded'), 'green'],
     partially_refunded: [t('orders.payment.status.partiallyRefunded'), 'orange'],
     partially_captured: [t('orders.payment.status.partiallyCaptured'), 'orange'],
     canceled: [t('orders.payment.status.canceled'), 'red'],
+    failed: [t('orders.payment.status.canceled'), 'red'],
     requires_action: [t('orders.payment.status.requiresAction'), 'orange']
-  }[status] as [string, 'red' | 'orange' | 'green'];
+  };
+
+  const [label, color] = statusMap[status] ?? ['-', 'orange'];
 
   return { label, color };
 };

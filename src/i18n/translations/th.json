@@ -1095,15 +1095,15 @@
       "statusTitle": "สถานะการชำระเงิน",
       "status": {
         "notPaid": "ยังไม่ได้ชำระ",
-        "authorized": "อนุมัติแล้ว",
-        "partiallyAuthorized": "อนุมัติบางส่วน",
-        "awaiting": "กำลังรอ",
-        "captured": "จับยอดแล้ว",
+        "authorized": "สร้างรายการชำระแล้ว",
+        "partiallyAuthorized": "สร้างรายการชำระบางส่วนแล้ว",
+        "awaiting": "รอชำระเงิน",
+        "captured": "ชำระเงินสำเร็จ",
         "partiallyRefunded": "คืนเงินบางส่วน",
-        "partiallyCaptured": "จับยอดบางส่วน",
+        "partiallyCaptured": "ชำระเงินบางส่วนสำเร็จ",
         "refunded": "คืนเงินแล้ว",
-        "canceled": "ยกเลิก",
-        "requiresAction": "ต้องการการดำเนินการ"
+        "canceled": "ยกเลิกการชำระ",
+        "requiresAction": "ต้องดำเนินการจากลูกค้า"
       },
       "capturePayment": "การชำระเงินจำนวน {{amount}} จะถูกจับยอด",
       "capturePaymentSuccess": "การจับยอดการชำระเงินจำนวน {{amount}} สำเร็จ",
