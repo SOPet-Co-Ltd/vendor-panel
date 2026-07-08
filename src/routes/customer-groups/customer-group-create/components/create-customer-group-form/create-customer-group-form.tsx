@@ -10,7 +10,7 @@ import { KeyboundForm } from '../../../../../components/utilities/keybound-form'
 import { useCreateCustomerGroup } from '../../../../../hooks/api/customer-groups';
 
 export const CreateCustomerGroupSchema = zod.object({
-  name: zod.string().min(1)
+  name: zod.string().trim().min(1)
 });
 
 export const CreateCustomerGroupForm = () => {

@@ -10,8 +10,8 @@ import { KeyboundForm } from '../../../../../components/utilities/keybound-form'
 import { useCreateShippingProfile } from '../../../../../hooks/api/shipping-profiles';
 
 const CreateShippingOptionsSchema = zod.object({
-  name: zod.string().min(1),
-  type: zod.string().min(1)
+  name: zod.string().trim().min(1),
+  type: zod.string().trim().min(1)
 });
 
 export function CreateShippingProfileForm() {

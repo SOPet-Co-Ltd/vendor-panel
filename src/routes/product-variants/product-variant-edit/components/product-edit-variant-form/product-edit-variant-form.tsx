@@ -23,7 +23,7 @@ type ProductEditVariantFormProps = {
 };
 
 const ProductEditVariantSchema = z.object({
-  title: z.string().min(1),
+  title: z.string().trim().min(1),
   material: z.string().optional(),
   sku: z.string().optional(),
   ean: z.string().optional(),

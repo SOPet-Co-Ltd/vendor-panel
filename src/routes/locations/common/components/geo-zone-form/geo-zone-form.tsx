@@ -22,7 +22,7 @@ import { useCountryTableQuery } from '../../../../regions/common/hooks/use-count
 import { GEO_ZONE_STACKED_MODAL_ID } from '../../constants';
 
 const GeoZoneSchema = z.object({
-  countries: z.array(z.object({ iso_2: z.string().min(2), display_name: z.string() }))
+  countries: z.array(z.object({ iso_2: z.string().trim().min(2), display_name: z.string() }))
 });
 
 type GeoZoneFormImplProps<TForm extends UseFormReturn<any>> = {

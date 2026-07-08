@@ -6,11 +6,11 @@ import { ConditionalPriceSchema } from '../../../common/schema';
 export type CreateShippingOptionSchema = z.infer<typeof CreateShippingOptionSchema>;
 
 export const CreateShippingOptionDetailsSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().trim().min(1),
   price_type: z.nativeEnum(ShippingOptionPriceType),
   enabled_in_store: z.boolean(),
-  shipping_profile_id: z.string().min(1),
-  provider_id: z.string().min(1),
+  shipping_profile_id: z.string().trim().min(1),
+  provider_id: z.string().trim().min(1),
   fulfillment_option_id: z.string().optional()
 });
 

@@ -22,7 +22,7 @@ type EditShippingOptionFormProps = {
 };
 
 const EditShippingOptionSchema = zod.object({
-  name: zod.string().min(1),
+  name: zod.string().trim().min(1),
   price_type: zod.nativeEnum(ShippingOptionPriceType),
   enabled_in_store: zod.boolean().optional(),
   shipping_profile_id: zod.string()

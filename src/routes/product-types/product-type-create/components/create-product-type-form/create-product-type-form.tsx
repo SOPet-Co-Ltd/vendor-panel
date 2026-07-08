@@ -10,7 +10,7 @@ import { KeyboundForm } from '../../../../../components/utilities/keybound-form'
 import { useCreateProductType } from '../../../../../hooks/api/product-types';
 
 const CreateProductTypeSchema = z.object({
-  value: z.string().min(1)
+  value: z.string().trim().min(1)
 });
 
 export const CreateProductTypeForm = () => {

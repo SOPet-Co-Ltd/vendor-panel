@@ -23,7 +23,7 @@ const TaxRegionCreateSchema = z.object({
     float: z.number().optional(),
     value: z.string().optional()
   }),
-  country_code: z.string().min(1)
+  country_code: z.string().trim().min(1)
 });
 
 export const TaxRegionCreateForm = ({ parentId }: TaxRegionCreateFormProps) => {

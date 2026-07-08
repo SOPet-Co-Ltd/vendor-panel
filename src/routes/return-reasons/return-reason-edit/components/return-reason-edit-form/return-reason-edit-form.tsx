@@ -15,8 +15,8 @@ type ReturnReasonEditFormProps = {
 };
 
 const ReturnReasonEditSchema = z.object({
-  value: z.string().min(1),
-  label: z.string().min(1),
+  value: z.string().trim().min(1),
+  label: z.string().trim().min(1),
   description: z.string().optional()
 });
 

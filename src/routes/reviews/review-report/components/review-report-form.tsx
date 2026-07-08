@@ -16,7 +16,7 @@ const reasonList = [
 ];
 
 const ReviewReplySchema = z.object({
-  reason: z.string().min(1, { message: 'Please select a reason' }),
+  reason: z.string().trim().min(1, { message: 'Please select a reason' }),
   comment: z.string().optional()
 });
 

@@ -17,7 +17,7 @@ type EditPromotionFormProps = {
 };
 
 const EditPromotionSchema = zod.object({
-  code: zod.string().min(1),
+  code: zod.string().trim().min(1),
   status: zod.enum(['active', 'inactive', 'draft']),
   value_type: zod.enum(['fixed', 'percentage']),
   value: zod.number(),

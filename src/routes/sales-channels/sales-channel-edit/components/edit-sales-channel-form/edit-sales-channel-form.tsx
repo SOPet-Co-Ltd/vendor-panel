@@ -15,7 +15,7 @@ type EditSalesChannelFormProps = {
 };
 
 const EditSalesChannelSchema = zod.object({
-  name: zod.string().min(1),
+  name: zod.string().trim().min(1),
   description: zod.string().optional(),
   is_active: zod.boolean()
 });

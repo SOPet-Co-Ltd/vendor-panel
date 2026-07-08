@@ -15,7 +15,7 @@ type EditApiKeyFormProps = {
 };
 
 const EditApiKeySchema = zod.object({
-  title: zod.string().min(1)
+  title: zod.string().trim().min(1)
 });
 
 export const EditApiKeyForm = ({ apiKey }: EditApiKeyFormProps) => {

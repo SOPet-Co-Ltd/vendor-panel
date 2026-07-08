@@ -15,7 +15,7 @@ type ProductTagEditFormProps = {
 };
 
 const ProductTagEditSchema = z.object({
-  value: z.string().min(1)
+  value: z.string().trim().min(1)
 });
 
 export const ProductTagEditForm = ({ productTag }: ProductTagEditFormProps) => {

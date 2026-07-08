@@ -15,7 +15,7 @@ import { useCreateApiKey } from '../../../../../hooks/api/api-keys';
 import { ApiKeyType } from '../../../common/constants';
 
 const ApiKeyCreateSchema = zod.object({
-  title: zod.string().min(1)
+  title: zod.string().trim().min(1)
 });
 
 type ApiKeyCreateFormProps = {

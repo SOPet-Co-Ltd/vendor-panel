@@ -18,7 +18,7 @@ type TaxRegionTaxRateEditFormProps = {
 };
 
 const TaxRegionTaxRateEditSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().trim().min(1),
   code: z.string().optional(),
   rate: z.object({
     float: z.number().optional(),

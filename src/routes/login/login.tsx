@@ -12,8 +12,8 @@ import { useSignInWithEmailPass } from '../../hooks/api';
 import { isFetchError } from '../../lib/is-fetch-error';
 
 const LoginSchema = z.object({
-  email: z.string().email(),
-  password: z.string()
+  email: z.string().trim().min(1).email(),
+  password: z.string().trim().min(1)
 });
 
 export const Login = () => {

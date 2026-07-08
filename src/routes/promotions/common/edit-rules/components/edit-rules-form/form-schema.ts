@@ -6,7 +6,10 @@ export const EditRules = z.object({
   rules: z.array(
     z.object({
       id: z.string().optional(),
-      attribute: z.string().min(1, { message: i18n.t('promotions.form.required') }),
+      attribute: z
+        .string()
+        .trim()
+        .min(1, { message: i18n.t('promotions.form.required') }),
       operator: z.preprocess(
         val => (val === '' ? undefined : val),
         z.enum(['gt', 'lt', 'eq', 'ne', 'in', 'lte', 'gte'], {
@@ -15,7 +18,10 @@ export const EditRules = z.object({
         })
       ),
       values: z.union([
-        z.string().min(1, { message: i18n.t('promotions.form.required') }),
+        z
+          .string()
+          .trim()
+          .min(1, { message: i18n.t('promotions.form.required') }),
         z.array(z.string()).min(1, { message: i18n.t('promotions.form.required') })
       ]),
       required: z.boolean().optional(),

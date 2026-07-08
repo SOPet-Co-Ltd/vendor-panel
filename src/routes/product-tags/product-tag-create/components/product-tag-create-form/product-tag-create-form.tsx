@@ -10,7 +10,7 @@ import { KeyboundForm } from '../../../../../components/utilities/keybound-form'
 import { useCreateVendorRequest } from '../../../../../hooks/api';
 
 const ProductTagCreateSchema = z.object({
-  value: z.string().min(1)
+  value: z.string().trim().min(1)
 });
 
 export const ProductTagCreateForm = () => {

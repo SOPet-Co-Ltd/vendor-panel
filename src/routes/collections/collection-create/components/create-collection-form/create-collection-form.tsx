@@ -11,7 +11,7 @@ import { KeyboundForm } from '../../../../../components/utilities/keybound-form'
 import { useCreateCollection } from '../../../../../hooks/api/collections';
 
 const CreateCollectionSchema = zod.object({
-  title: zod.string().min(1),
+  title: zod.string().trim().min(1),
   handle: zod.string().optional()
 });
 

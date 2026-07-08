@@ -54,7 +54,7 @@ export type ProductCreateOptionSchema = z.infer<typeof ProductCreateOptionSchema
 
 export const ProductCreateSchema = z
   .object({
-    title: z.string().min(1),
+    title: z.string().trim().min(1),
     subtitle: z.string().optional(),
     handle: z.string().optional(),
     description: z.string().optional(),

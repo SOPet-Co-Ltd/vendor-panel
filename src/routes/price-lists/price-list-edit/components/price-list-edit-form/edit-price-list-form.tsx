@@ -18,8 +18,8 @@ type PriceListEditFormProps = {
 const PriceListEditSchema = z.object({
   status: z.nativeEnum(PriceListStatus),
   type: z.nativeEnum(PriceListType),
-  title: z.string().min(1),
-  description: z.string().min(1)
+  title: z.string().trim().min(1),
+  description: z.string().trim().min(1)
 });
 
 export const PriceListEditForm = ({ priceList }: PriceListEditFormProps) => {
