@@ -21,6 +21,7 @@ import { useDataTableDateColumns } from '../../../../../components/data-table/he
 import { useDataTableDateFilters } from '../../../../../components/data-table/helpers/general/use-data-table-date-filters';
 import { useInventoryItemLevels } from '../../../../../hooks/api';
 import { useDeleteVariantLazy } from '../../../../../hooks/api/products';
+import { useQueryParams } from '../../../../../hooks/use-query-params';
 import { ExtendedAdminProduct, ExtendedAdminProductVariant } from '../../../../../types/products';
 import { PRODUCT_VARIANT_IDS_KEY } from '../../../common/constants';
 
@@ -37,14 +38,71 @@ export const ProductVariantSection = ({ product }: ProductVariantSectionProps) =
   const filters = useFilters();
   const commands = useCommands();
 
-  const { variants } = product;
+  const { q, order, offset, ...filterParams } = useQueryParams([
+    'q',
+    'order',
+    'offset',
+    'allow_backorder',
+    'manage_inventory',
+    'created_at',
+    'updated_at'
+  ]);
 
-  const count = variants ? variants?.length : 0;
+  const filteredVariants = useMemo(() => {
+    const parseBoolean = (value?: string) => {
+      if (!value) return undefined;
+      return JSON.parse(value) === true || JSON.parse(value) === 'true';
+    };
+
+    const allowBackorder = parseBoolean(filterParams.allow_backorder);
+    const manageInventory = parseBoolean(filterParams.manage_inventory);
+
+    let result = (product.variants ?? []).filter(v => {
+      if (q && ![v.title, v.sku].some(field => field?.toLowerCase().includes(q.toLowerCase()))) {
+        return false;
+      }
+
+      if (allowBackorder !== undefined && v.allow_backorder !== allowBackorder) {
+        return false;
+      }
+
+      if (manageInventory !== undefined && v.manage_inventory !== manageInventory) {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (order) {
+      const desc = order.startsWith('-');
+      const field = (desc ? order.slice(1) : order) as keyof ExtendedAdminProductVariant;
+
+      result = [...result].sort((a, b) => {
+        const aValue = a[field];
+        const bValue = b[field];
+
+        return typeof aValue === 'string' && typeof bValue === 'string'
+          ? desc
+            ? bValue.localeCompare(aValue)
+            : aValue.localeCompare(bValue)
+          : 0;
+      });
+    }
+
+    return result;
+  }, [product.variants, q, order, filterParams.allow_backorder, filterParams.manage_inventory]);
+
+  const count = filteredVariants.length;
+
+  const paginatedVariants = useMemo(() => {
+    const off = offset ? parseInt(offset) : 0;
+    return filteredVariants.slice(off, off + PAGE_SIZE);
+  }, [filteredVariants, offset]);
 
   return (
     <Container className="divide-y p-0">
       <DataTable
-        data={variants || undefined}
+        data={(paginatedVariants as ExtendedAdminProductVariant[]) || undefined}
         columns={columns}
         filters={filters}
         rowCount={count}
