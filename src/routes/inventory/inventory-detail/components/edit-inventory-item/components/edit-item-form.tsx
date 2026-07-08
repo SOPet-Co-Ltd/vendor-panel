@@ -17,7 +17,7 @@ type EditInventoryItemFormProps = {
 
 const EditInventoryItemSchema = z.object({
   title: z.string().optional(),
-  sku: z.string().min(1)
+  sku: z.string().trim().min(1)
 });
 
 const getDefaultValues = (item: HttpTypes.AdminInventoryItem) => {

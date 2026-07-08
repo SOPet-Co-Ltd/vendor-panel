@@ -16,7 +16,7 @@ type EditProductOptionsFormProps = {
 };
 
 const CreateProductOptionSchema = z.object({
-  title: z.string().min(1),
+  title: z.string().trim().min(1),
   values: z.array(z.string()).optional()
 });
 

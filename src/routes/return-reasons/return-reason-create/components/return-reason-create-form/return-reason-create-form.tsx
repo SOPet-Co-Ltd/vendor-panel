@@ -10,8 +10,8 @@ import { KeyboundForm } from '../../../../../components/utilities/keybound-form'
 import { useCreateReturnReason } from '../../../../../hooks/api/return-reasons';
 
 const ReturnReasonCreateSchema = z.object({
-  value: z.string().min(1),
-  label: z.string().min(1),
+  value: z.string().trim().min(1),
+  label: z.string().trim().min(1),
   description: z.string().optional()
 });
 

@@ -10,8 +10,8 @@ import { KeyboundForm } from '../../../../../components/utilities/keybound-form'
 import { useCreateSalesChannel } from '../../../../../hooks/api/sales-channels';
 
 const CreateSalesChannelSchema = zod.object({
-  name: zod.string().min(1),
-  description: zod.string().min(1),
+  name: zod.string().trim().min(1),
+  description: zod.string().trim().min(1),
   enabled: zod.boolean()
 });
 

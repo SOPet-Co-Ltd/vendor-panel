@@ -18,10 +18,10 @@ import { isFetchError } from '../../lib/is-fetch-error';
 
 const CreateAccountSchema = z
   .object({
-    first_name: z.string().min(1),
-    last_name: z.string().min(1),
-    password: z.string().min(1),
-    repeat_password: z.string().min(1)
+    first_name: z.string().trim().min(1),
+    last_name: z.string().trim().min(1),
+    password: z.string().trim().min(1),
+    repeat_password: z.string().trim().min(1)
   })
   .superRefine(({ password, repeat_password }, ctx) => {
     if (password !== repeat_password) {

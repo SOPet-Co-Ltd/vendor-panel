@@ -17,7 +17,7 @@ import { GeoZoneForm } from '../../../common/components/geo-zone-form';
 import { GEO_ZONE_STACKED_MODAL_ID } from '../../../common/constants';
 
 const EditeServiceZoneSchema = z.object({
-  countries: z.array(z.object({ iso_2: z.string().min(2), display_name: z.string() })).min(1)
+  countries: z.array(z.object({ iso_2: z.string().trim().min(2), display_name: z.string() })).min(1)
 });
 
 type EditServiceZoneAreasFormProps = {

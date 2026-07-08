@@ -11,7 +11,7 @@ import { KeyboundForm } from '../../../../../components/utilities/keybound-form'
 import { useUpdateProductType } from '../../../../../hooks/api/product-types';
 
 const EditProductTypeSchema = z.object({
-  value: z.string().min(1)
+  value: z.string().trim().min(1)
 });
 
 type EditProductTypeFormProps = {

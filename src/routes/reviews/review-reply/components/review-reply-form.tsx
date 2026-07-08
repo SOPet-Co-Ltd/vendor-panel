@@ -9,7 +9,7 @@ import { RouteDrawer, useRouteModal } from '../../../../components/modals';
 import { useReview, useUpdateReview } from '../../../../hooks/api/review';
 
 const ReviewReplySchema = z.object({
-  seller_note: z.string().min(1)
+  seller_note: z.string().trim().min(1)
 });
 
 export const ReviewReplyForm = () => {

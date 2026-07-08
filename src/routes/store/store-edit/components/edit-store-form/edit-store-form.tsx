@@ -17,7 +17,7 @@ import { StoreVendor } from '../../../../../types/user';
 import { MediaSchema } from '../../../../products/product-create/constants';
 
 export const EditStoreSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().trim().min(1),
   description: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().optional(),

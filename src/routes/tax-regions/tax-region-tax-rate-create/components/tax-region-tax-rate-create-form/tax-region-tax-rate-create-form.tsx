@@ -18,8 +18,8 @@ type TaxRegionTaxRateCreateFormProps = {
 };
 
 const TaxRegionTaxRateCreateSchema = z.object({
-  name: z.string().min(1),
-  code: z.string().min(1),
+  name: z.string().trim().min(1),
+  code: z.string().trim().min(1),
   rate: z
     .object({
       float: z.number().optional(),

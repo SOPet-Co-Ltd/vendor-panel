@@ -4,7 +4,7 @@ import * as zod from 'zod';
 import { optionalInt } from '../../../../../lib/validation';
 
 export const CreateProductVariantSchema = z.object({
-  title: z.string().min(1),
+  title: z.string().trim().min(1),
   sku: z.string().optional(),
   manage_inventory: z.boolean().optional(),
   allow_backorder: z.boolean().optional(),

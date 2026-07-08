@@ -16,8 +16,8 @@ import { useCreateReservationItem } from '../../../../../hooks/api/reservations'
 import { useStockLocations } from '../../../../../hooks/api/stock-locations';
 
 export const CreateReservationSchema = zod.object({
-  inventory_item_id: zod.string().min(1),
-  location_id: zod.string().min(1),
+  inventory_item_id: zod.string().trim().min(1),
+  location_id: zod.string().trim().min(1),
   quantity: zod.number().min(1),
   description: zod.string().optional()
 });

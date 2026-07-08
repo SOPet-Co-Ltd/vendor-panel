@@ -20,9 +20,9 @@ type TaxRegionProvinceCreateFormProps = {
 };
 
 const CreateTaxRegionProvinceSchema = z.object({
-  province_code: z.string().min(1),
+  province_code: z.string().trim().min(1),
   name: z.string().optional(),
-  code: z.string().min(1),
+  code: z.string().trim().min(1),
   rate: z
     .object({
       float: z.number().optional(),

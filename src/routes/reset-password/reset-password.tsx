@@ -19,8 +19,8 @@ const ResetPasswordInstructionsSchema = z.object({
 
 const ResetPasswordSchema = z
   .object({
-    password: z.string().min(1),
-    repeat_password: z.string().min(1)
+    password: z.string().trim().min(1),
+    repeat_password: z.string().trim().min(1)
   })
   .superRefine(({ password, repeat_password }, ctx) => {
     if (password !== repeat_password) {

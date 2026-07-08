@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { optionalInt } from '../../../../../lib/validation';
 
 export const CreateInventoryItemSchema = z.object({
-  title: z.string().min(1),
+  title: z.string().trim().min(1),
   description: z.string().optional(),
   sku: z.string().optional(),
   hs_code: z.string().optional(),

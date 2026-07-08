@@ -34,15 +34,15 @@ export const WEEKDAY_OPTIONS = [
 ] as const;
 
 export const PayoutAccountSchema = z.object({
-  name: z.string().min(1, 'Recipient name is required'),
+  name: z.string().trim().min(1, 'Recipient name is required'),
   email: z.string().email('Enter a valid email').optional().or(z.literal('')),
   account_type: z.enum(['individual', 'corporation']),
-  bank_brand: z.string().min(1, 'Bank code is required'),
+  bank_brand: z.string().trim().min(1, 'Bank code is required'),
   bank_account_number: z
     .string()
     .min(1, 'Bank account number is required')
     .regex(/^\d+$/, 'Bank account number must contain digits only'),
-  bank_account_name: z.string().min(1, 'Bank account name is required'),
+  bank_account_name: z.string().trim().min(1, 'Bank account name is required'),
   tax_id: z.string().regex(/^\d*$/, 'Tax ID must contain digits only').optional()
 });
 

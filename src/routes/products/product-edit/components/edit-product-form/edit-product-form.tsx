@@ -53,8 +53,8 @@ const getSelectableVendorStatuses = (
 
 const EditProductSchema = zod.object({
   status: zod.enum(VENDOR_PRODUCT_STATUSES),
-  title: zod.string().min(1),
-  handle: zod.string().min(1),
+  title: zod.string().trim().min(1),
+  handle: zod.string().trim().min(1),
   description: zod.string().optional(),
   discountable: zod.boolean()
 });

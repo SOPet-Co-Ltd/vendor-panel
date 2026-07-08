@@ -16,8 +16,8 @@ type EditCollectionFormProps = {
 };
 
 const EditCollectionSchema = zod.object({
-  title: zod.string().min(1),
-  handle: zod.string().min(1)
+  title: zod.string().trim().min(1),
+  handle: zod.string().trim().min(1)
 });
 
 export const EditCollectionForm = ({ collection, requestId }: EditCollectionFormProps) => {

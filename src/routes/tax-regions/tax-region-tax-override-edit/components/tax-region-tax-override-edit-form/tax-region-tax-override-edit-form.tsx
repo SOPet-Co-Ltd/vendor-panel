@@ -44,8 +44,8 @@ const STACKED_MODAL_ID = 'tr';
 const getStackedModalId = (type: TaxRateRuleReferenceType) => `${STACKED_MODAL_ID}-${type}`;
 
 const TaxRegionTaxRateEditSchema = z.object({
-  name: z.string().min(1),
-  code: z.string().min(1),
+  name: z.string().trim().min(1),
+  code: z.string().trim().min(1),
   rate: z.object({
     float: z.number().optional(),
     value: z.string().optional()

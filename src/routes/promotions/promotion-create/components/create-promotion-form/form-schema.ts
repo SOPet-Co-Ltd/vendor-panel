@@ -5,7 +5,7 @@ import { CreateCampaignSchema } from '../../../../campaigns/campaign-create/comp
 const RuleSchema = z.array(
   z.object({
     id: z.string().optional(),
-    attribute: z.string().min(1, { message: 'Required field' }),
+    attribute: z.string().trim().min(1, { message: 'Required field' }),
     operator: z.preprocess(
       val => (val === '' ? undefined : val),
       z.enum(['gt', 'lt', 'eq', 'ne', 'in', 'lte', 'gte'], {
@@ -15,7 +15,7 @@ const RuleSchema = z.array(
     ),
     values: z.union([
       z.number().min(1, { message: 'Required field' }),
-      z.string().min(1, { message: 'Required field' }),
+      z.string().trim().min(1, { message: 'Required field' }),
       z.array(z.string()).min(1, { message: 'Required field' })
     ]),
     required: z.boolean().optional(),
@@ -30,7 +30,7 @@ export const CreatePromotionSchema = z
     campaign_id: z.string().optional(),
     campaign_choice: z.enum(['none', 'existing', 'new']).optional(),
     is_automatic: z.string().toLowerCase(),
-    code: z.string().min(1),
+    code: z.string().trim().min(1),
     type: z.enum(['buyget', 'standard']),
     status: z.enum(['draft', 'active', 'inactive']),
     rules: RuleSchema,

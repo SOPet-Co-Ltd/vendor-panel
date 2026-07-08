@@ -16,7 +16,7 @@ type EditServiceZoneFormProps = {
 };
 
 const EditServiceZoneSchema = zod.object({
-  name: zod.string().min(1)
+  name: zod.string().trim().min(1)
 });
 
 export const EditServiceZoneForm = ({
