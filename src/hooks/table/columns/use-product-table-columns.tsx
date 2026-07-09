@@ -46,9 +46,10 @@ export const useProductTableColumns = () => {
         header: () => <VariantHeader />,
         cell: ({ row }) => <VariantCell variants={row.original.variants} />
       }),
-      columnHelper.accessor('status', {
+      columnHelper.display({
+        id: 'searchVisibility',
         header: () => <ProductStatusHeader />,
-        cell: ({ row }) => <ProductStatusCell status={row.original?.status} />
+        cell: ({ row }) => <ProductStatusCell metadata={row.original?.metadata} />
       })
     ],
     []

@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, Outlet } from 'react-router-dom';
 
 import { ActionMenu } from '../../../../../components/common/action-menu';
+import { ConditionalTooltip } from '../../../../../components/common/conditional-tooltip';
 import { _DataTable } from '../../../../../components/table/data-table';
 import {
   useBulkDeleteProducts,
@@ -18,12 +19,16 @@ import { useProductTableColumns } from '../../../../../hooks/table/columns/use-p
 import { useProductTableFilters } from '../../../../../hooks/table/filters/use-product-table-filters';
 import { useProductTableQuery } from '../../../../../hooks/table/query/use-product-table-query';
 import { useDataTable } from '../../../../../hooks/use-data-table';
+import { useVendorProductSetupRequirements } from '../../../../../hooks/use-vendor-product-setup-requirements';
 import { ExtendedAdminProduct } from '../../../../../types/products';
 
 export const PAGE_SIZE = 10;
 
 export const ProductListTable = () => {
   const { t } = useTranslation();
+  const setup = useVendorProductSetupRequirements();
+  const canManageProducts = setup.isReady && !setup.isLoading;
+  const setupDisabledTooltip = t('products.setupRequired.disabledTooltip');
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -116,20 +121,25 @@ export const ProductListTable = () => {
           >
             <Link to={`export${location.search}`}>{t('actions.export')}</Link>
           </Button>
-          <Button
-            size="small"
-            variant="secondary"
-            asChild
+          <ConditionalTooltip
+            showTooltip={!canManageProducts}
+            content={setupDisabledTooltip}
           >
-            <Link to="import">{t('actions.import')}</Link>
-          </Button>
-          <Button
-            size="small"
-            variant="primary"
-            asChild
-          >
-            <Link to="create">{t('actions.create')}</Link>
-          </Button>
+            <span className="inline-flex">
+              <Button
+                size="small"
+                variant="primary"
+                disabled={!canManageProducts}
+                asChild={canManageProducts}
+              >
+                {canManageProducts ? (
+                  <Link to="create">{t('actions.create')}</Link>
+                ) : (
+                  <span>{t('actions.create')}</span>
+                )}
+              </Button>
+            </span>
+          </ConditionalTooltip>
         </div>
       </div>
       <_DataTable
@@ -164,10 +174,14 @@ export const ProductListTable = () => {
         noRecords={{
           title: t('products.list.noRecordsTitle'),
           message: t('products.list.noRecordsMessage'),
-          action: {
-            to: '/products/create',
-            label: t('actions.add')
-          }
+          ...(canManageProducts
+            ? {
+                action: {
+                  to: '/products/create',
+                  label: t('actions.add')
+                }
+              }
+            : {})
         }}
       />
       <Outlet />

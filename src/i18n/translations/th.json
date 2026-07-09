@@ -406,6 +406,13 @@
       "noRecordsMessage": "สร้างสินค้าชิ้นแรกของคุณเพื่อเริ่มต้นการขาย",
       "noRecordsTitle": "ไม่มีสินค้า"
     },
+    "setupRequired": {
+      "title": "กรุณาตั้งค่าร้านให้ครบก่อน",
+      "description": "ตั้งค่าวิธีการจัดส่งอย่างน้อยหนึ่งวิธีและเชื่อมต่อ Omise ก่อนสร้างหรือนำเข้าสินค้า",
+      "disabledTooltip": "ตั้งค่าการจัดส่งและเชื่อมต่อ Omise ก่อน",
+      "shippingAction": "ตั้งค่าการจัดส่ง",
+      "omiseAction": "เชื่อมต่อ Omise"
+    },
     "edit": {
       "header": "แก้ไขสินค้า",
       "description": "แก้ไขรายละเอียดของสินค้า",
@@ -731,6 +738,8 @@
       "requirementVariantPrice": "อย่างน้อยหนึ่ง variant มีราคา",
       "requirementVariantLocation": "อย่างน้อยหนึ่ง variant มีสต็อกที่สถานที่จัดเก็บ",
       "requirementSeller": "สินค้าผูกกับร้านของคุณ",
+      "requirementShippingMethod": "ร้านมีการตั้งค่าวิธีการจัดส่งอย่างน้อยหนึ่งวิธี",
+      "requirementOmiseConnected": "ร้านเชื่อมต่อ Omise สำหรับรับเงินแล้ว",
       "missingRequirements": "ยังขาด:",
       "missingCount_one": "ยังขาด {{count}} ข้อ",
       "missingCount_other": "ยังขาด {{count}} ข้อ",
@@ -1620,7 +1629,8 @@
       },
       "delete": {
         "confirmation": "คุณกำลังจะลบตัวเลือกการจัดส่ง {{name}} การดำเนินการนี้ไม่สามารถย้อนกลับได้",
-        "successToast": "ตัวเลือกการจัดส่ง {{name}} ถูกลบเรียบร้อยแล้ว"
+        "successToast": "ตัวเลือกการจัดส่ง {{name}} ถูกลบเรียบร้อยแล้ว",
+        "lastOptionTooltip": "ต้องมีวิธีการจัดส่งอย่างน้อยหนึ่งวิธี"
       },
       "edit": {
         "header": "แก้ไขตัวเลือกการจัดส่ง",

@@ -1,23 +1,19 @@
-import { HttpTypes } from '@medusajs/types';
 import { useTranslation } from 'react-i18next';
 
 import { StatusCell } from '../../common/status-cell';
 
 type ProductStatusCellProps = {
-  status: HttpTypes.AdminProductStatus;
+  metadata?: Record<string, unknown> | null;
 };
 
-export const ProductStatusCell = ({ status }: ProductStatusCellProps) => {
+export const ProductStatusCell = ({ metadata }: ProductStatusCellProps) => {
   const { t } = useTranslation();
+  const isPublishedToSearch = metadata?.published_to_algolia === true;
 
-  if (!status) return null;
-
-  const [color, text] = {
-    draft: ['grey', t('products.productStatus.draft')],
-    proposed: ['orange', t('products.productStatus.proposed')],
-    published: ['green', t('products.productStatus.published')],
-    rejected: ['red', t('products.productStatus.rejected')]
-  }[status] as ['grey' | 'orange' | 'green' | 'red', string];
+  const color = isPublishedToSearch ? 'green' : 'grey';
+  const text = isPublishedToSearch
+    ? t('products.searchVisibility.statusPublished')
+    : t('products.searchVisibility.statusNotPublished');
 
   return <StatusCell color={color}>{text}</StatusCell>;
 };
@@ -27,7 +23,7 @@ export const ProductStatusHeader = () => {
 
   return (
     <div className="flex h-full w-full items-center">
-      <span>{t('fields.status')}</span>
+      <span>{t('products.searchVisibility.header')}</span>
     </div>
   );
 };

@@ -406,6 +406,13 @@
       "noRecordsTitle": "No products yet",
       "noRecordsMessage": "Create products to start selling on the marketplace"
     },
+    "setupRequired": {
+      "title": "Complete store setup first",
+      "description": "Set up at least one shipping method and connect Omise before creating or importing products.",
+      "disabledTooltip": "Set up shipping and connect Omise first",
+      "shippingAction": "Set up shipping",
+      "omiseAction": "Connect Omise"
+    },
     "edit": {
       "header": "Edit Product",
       "description": "Edit the product details.",
@@ -731,6 +738,8 @@
       "requirementVariantPrice": "At least one variant has a price",
       "requirementVariantLocation": "At least one variant has inventory at a stock location",
       "requirementSeller": "Product is linked to your store",
+      "requirementShippingMethod": "Store has at least one shipping method configured",
+      "requirementOmiseConnected": "Store is connected to Omise for payouts",
       "missingRequirements": "Missing:",
       "missingCount_one": "{{count}} requirement missing.",
       "missingCount_other": "{{count}} requirements missing.",
@@ -1625,7 +1634,8 @@
       },
       "delete": {
         "confirmation": "You are about to delete the shipping option {{name}}. This action cannot be undone.",
-        "successToast": "Shipping option {{name}} was successfully deleted."
+        "successToast": "Shipping option {{name}} was successfully deleted.",
+        "lastOptionTooltip": "You must keep at least one shipping method configured."
       },
       "edit": {
         "header": "Edit Shipping Option",

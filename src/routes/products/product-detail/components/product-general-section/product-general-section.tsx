@@ -1,5 +1,5 @@
 import { PencilSquare, Trash } from '@medusajs/icons';
-import { Container, Heading, StatusBadge, usePrompt } from '@medusajs/ui';
+import { Container, Heading, usePrompt } from '@medusajs/ui';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,21 +8,6 @@ import { SectionRow } from '../../../../../components/common/section';
 import { useDashboardExtension } from '../../../../../extensions';
 import { useDeleteProduct } from '../../../../../hooks/api/products';
 import { ExtendedAdminProduct } from '../../../../../types/products';
-
-const productStatusColor = (status: string) => {
-  switch (status) {
-    case 'draft':
-      return 'grey';
-    case 'proposed':
-      return 'orange';
-    case 'published':
-      return 'green';
-    case 'rejected':
-      return 'red';
-    default:
-      return 'grey';
-  }
-};
 
 type ProductGeneralSectionProps = {
   product: ExtendedAdminProduct;
@@ -64,9 +49,6 @@ export const ProductGeneralSection = ({ product }: ProductGeneralSectionProps) =
       <div className="flex items-center justify-between px-6 py-4">
         <Heading>{product.title}</Heading>
         <div className="flex items-center gap-x-4">
-          <StatusBadge color={productStatusColor(product.status)}>
-            {t(`products.productStatus.${product.status}`)}
-          </StatusBadge>
           <ActionMenu
             groups={[
               {

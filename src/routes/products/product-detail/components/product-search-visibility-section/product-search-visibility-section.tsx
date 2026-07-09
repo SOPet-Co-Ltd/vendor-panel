@@ -8,13 +8,14 @@ import {
   usePublishProductToAlgolia,
   useUnpublishProductFromAlgolia
 } from '../../../../../hooks/api/algolia';
+import { useVendorProductSetupRequirements } from '../../../../../hooks/use-vendor-product-setup-requirements';
 import { ExtendedAdminProduct } from '../../../../../types/products';
 
 type ProductSearchVisibilitySectionProps = {
   product: ExtendedAdminProduct;
 };
 
-/** Requirements checked by backend validateProductForAlgolia (seller is not derivable in UI). */
+/** Requirements checked by backend validateProductForAlgolia. */
 function usePublishRequirements(product: ExtendedAdminProduct) {
   return useMemo(() => {
     const hasTitle = Boolean(product.title?.trim());
@@ -72,6 +73,11 @@ export const ProductSearchVisibilitySection = ({
   const isPublishedToSearch = product.metadata?.published_to_algolia === true;
   const publishedAt = product.metadata?.algolia_published_at as string | undefined;
   const requirements = usePublishRequirements(product);
+  const vendorRequirements = useVendorProductSetupRequirements();
+  const allRequirementsMet =
+    requirements.allMet &&
+    vendorRequirements.hasShippingMethod &&
+    vendorRequirements.hasOmiseConnected;
 
   const publishMutation = usePublishProductToAlgolia(product.id);
   const unpublishMutation = useUnpublishProductFromAlgolia(product.id);
@@ -164,6 +170,16 @@ export const ProductSearchVisibilitySection = ({
       key: 'seller',
       met: true,
       label: t('products.searchVisibility.requirementSeller')
+    },
+    {
+      key: 'shippingMethod',
+      met: vendorRequirements.hasShippingMethod,
+      label: t('products.searchVisibility.requirementShippingMethod')
+    },
+    {
+      key: 'omiseConnected',
+      met: vendorRequirements.hasOmiseConnected,
+      label: t('products.searchVisibility.requirementOmiseConnected')
     }
   ];
 
@@ -258,7 +274,9 @@ export const ProductSearchVisibilitySection = ({
               size="small"
               variant="secondary"
               onClick={handlePublish}
-              disabled={!requirements.allMet || publishMutation.isPending}
+              disabled={
+                !allRequirementsMet || vendorRequirements.isLoading || publishMutation.isPending
+              }
             >
               {t('products.searchVisibility.publishButton')}
             </Button>

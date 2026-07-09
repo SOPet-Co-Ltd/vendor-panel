@@ -6,10 +6,12 @@ import { useTranslation } from 'react-i18next';
 
 import { FilePreview } from '../../../components/common/file-preview';
 import { RouteDrawer, useRouteModal } from '../../../components/modals';
+import { VendorProductSetupRequired } from '../../../components/vendor-product-setup/vendor-product-setup-required';
 import {
   // useConfirmImportProducts,
   useImportProducts
 } from '../../../hooks/api';
+import { useVendorProductSetupRequirements } from '../../../hooks/use-vendor-product-setup-requirements';
 import { ImportSummary } from './components/import-summary';
 import { UploadImport } from './components/upload-import';
 import { getProductImportCsvTemplate } from './helpers/import-template';
@@ -34,6 +36,7 @@ export const ProductImport = () => {
 
 const ProductImportContent = () => {
   const { t } = useTranslation();
+  const setup = useVendorProductSetupRequirements();
   const [filename, setFilename] = useState<string>();
 
   const { mutateAsync: importProducts, isPending, data } = useImportProducts();
@@ -46,6 +49,10 @@ const ProductImportContent = () => {
   }, []);
 
   const handleUploaded = async (file: File) => {
+    if (!setup.isReady) {
+      return;
+    }
+
     setFilename(file.name);
     await importProducts(
       { file },
@@ -97,51 +104,57 @@ const ProductImportContent = () => {
   return (
     <>
       <RouteDrawer.Body>
-        <Heading level="h2">{t('products.import.upload.title')}</Heading>
-        <Text
-          size="small"
-          className="text-ui-fg-subtle"
-        >
-          {t('products.import.upload.description')}
-        </Text>
+        {!setup.isLoading && !setup.isReady ? (
+          <VendorProductSetupRequired />
+        ) : (
+          <>
+            <Heading level="h2">{t('products.import.upload.title')}</Heading>
+            <Text
+              size="small"
+              className="text-ui-fg-subtle"
+            >
+              {t('products.import.upload.description')}
+            </Text>
 
-        <div className="mt-4">
-          {filename ? (
-            <FilePreview
-              filename={filename}
-              loading={isPending}
-              activity={t('products.import.upload.preprocessing')}
-              actions={uploadedFileActions}
-            />
-          ) : (
-            <UploadImport onUploaded={handleUploaded} />
-          )}
-        </div>
+            <div className="mt-4">
+              {filename ? (
+                <FilePreview
+                  filename={filename}
+                  loading={isPending}
+                  activity={t('products.import.upload.preprocessing')}
+                  actions={uploadedFileActions}
+                />
+              ) : (
+                <UploadImport onUploaded={handleUploaded} />
+              )}
+            </div>
 
-        {data?.summary && !!filename && (
-          <div className="mt-4">
-            <ImportSummary summary={data?.summary} />
-          </div>
+            {data?.summary && !!filename && (
+              <div className="mt-4">
+                <ImportSummary summary={data?.summary} />
+              </div>
+            )}
+
+            <Heading
+              className="mt-6"
+              level="h2"
+            >
+              {t('products.import.template.title')}
+            </Heading>
+            <Text
+              size="small"
+              className="text-ui-fg-subtle"
+            >
+              {t('products.import.template.description')}
+            </Text>
+            <div className="mt-4">
+              <FilePreview
+                filename={'product-import-template.csv'}
+                url={productImportTemplateContent}
+              />
+            </div>
+          </>
         )}
-
-        <Heading
-          className="mt-6"
-          level="h2"
-        >
-          {t('products.import.template.title')}
-        </Heading>
-        <Text
-          size="small"
-          className="text-ui-fg-subtle"
-        >
-          {t('products.import.template.description')}
-        </Text>
-        <div className="mt-4">
-          <FilePreview
-            filename={'product-import-template.csv'}
-            url={productImportTemplateContent}
-          />
-        </div>
       </RouteDrawer.Body>
       <RouteDrawer.Footer>
         <div className="flex items-center gap-x-2">

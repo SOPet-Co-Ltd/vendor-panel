@@ -1507,6 +1507,28 @@
           "required": ["noRecordsTitle", "noRecordsMessage"],
           "additionalProperties": false
         },
+        "setupRequired": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "disabledTooltip": {
+              "type": "string"
+            },
+            "shippingAction": {
+              "type": "string"
+            },
+            "omiseAction": {
+              "type": "string"
+            }
+          },
+          "required": ["title", "description", "disabledTooltip", "shippingAction", "omiseAction"],
+          "additionalProperties": false
+        },
         "edit": {
           "type": "object",
           "properties": {
@@ -2652,6 +2674,12 @@
             "requirementSeller": {
               "type": "string"
             },
+            "requirementShippingMethod": {
+              "type": "string"
+            },
+            "requirementOmiseConnected": {
+              "type": "string"
+            },
             "missingRequirements": {
               "type": "string"
             },
@@ -2698,6 +2726,8 @@
             "requirementVariantPrice",
             "requirementVariantLocation",
             "requirementSeller",
+            "requirementShippingMethod",
+            "requirementOmiseConnected",
             "missingRequirements",
             "missingCount_one",
             "missingCount_other",
@@ -2842,6 +2872,7 @@
       "required": [
         "domain",
         "list",
+        "setupRequired",
         "edit",
         "create",
         "export",
@@ -6016,9 +6047,12 @@
                 },
                 "successToast": {
                   "type": "string"
+                },
+                "lastOptionTooltip": {
+                  "type": "string"
                 }
               },
-              "required": ["confirmation", "successToast"],
+              "required": ["confirmation", "successToast", "lastOptionTooltip"],
               "additionalProperties": false
             },
             "edit": {

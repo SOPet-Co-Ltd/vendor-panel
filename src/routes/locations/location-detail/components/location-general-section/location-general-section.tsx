@@ -33,7 +33,10 @@ import {
   useDeleteFulfillmentServiceZone,
   useDeleteFulfillmentSet
 } from '../../../../../hooks/api/fulfillment-sets';
-import { useDeleteShippingOption } from '../../../../../hooks/api/shipping-options';
+import {
+  useDeleteShippingOption,
+  useShippingOptions
+} from '../../../../../hooks/api/shipping-options';
 import {
   useCreateStockLocationFulfillmentSet,
   useDeleteStockLocation
@@ -101,10 +104,25 @@ type ShippingOptionProps = {
 function ShippingOption({ option, fulfillmentSetId, locationId }: ShippingOptionProps) {
   const prompt = usePrompt();
   const { t } = useTranslation();
+  const { shipping_options = [] } = useShippingOptions(
+    { limit: 200 },
+    { staleTime: 5 * 60 * 1000 }
+  );
 
   const { mutateAsync } = useDeleteShippingOption(option.id);
 
+  const outboundShippingOptionCount = useMemo(
+    () => shipping_options.filter(o => !isReturnOption(o)).length,
+    [shipping_options]
+  );
+  const isOutboundOption = !isReturnOption(option);
+  const canDelete = !isOutboundOption || outboundShippingOptionCount > 1;
+
   const handleDelete = async () => {
+    if (!canDelete) {
+      return;
+    }
+
     const res = await prompt({
       title: t('general.areYouSure'),
       description: t('stockLocations.shippingOptions.delete.confirmation', {
@@ -167,7 +185,9 @@ function ShippingOption({ option, fulfillmentSetId, locationId }: ShippingOption
               {
                 label: t('actions.delete'),
                 icon: <Trash />,
-                onClick: handleDelete
+                onClick: handleDelete,
+                disabled: !canDelete,
+                disabledTooltip: t('stockLocations.shippingOptions.delete.lastOptionTooltip')
               }
             ]
           }
