@@ -214,7 +214,7 @@ export const useCreatePromotion = (
 ) => {
   return useMutation({
     mutationFn: payload =>
-      fetchQuery('/vendor/promotions', {
+      fetchQuery('/vendor/promotions/create', {
         method: 'POST',
         body: payload
       }),

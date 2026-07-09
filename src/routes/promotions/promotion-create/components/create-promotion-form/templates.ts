@@ -107,7 +107,10 @@ export const templates = [
       application_method: {
         type: 'percentage',
         value: 100,
+        target_type: 'items',
+        allocation: 'each',
         apply_to_quantity: 1,
+        buy_rules_min_quantity: 1,
         max_quantity: 1
       }
     }

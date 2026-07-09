@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
+import type {
   ApplicationMethodAllocationValues,
   ApplicationMethodTargetTypeValues,
   ApplicationMethodTypeValues,
-  PromotionRuleOperatorValues,
   PromotionStatusValues,
   PromotionTypeValues
 } from '@medusajs/types';
@@ -34,10 +33,12 @@ import { RouteFocusModal, useRouteModal } from '../../../../../components/modals
 import { KeyboundForm } from '../../../../../components/utilities/keybound-form';
 import { useCampaigns } from '../../../../../hooks/api/campaigns';
 import { useCreatePromotion } from '../../../../../hooks/api/promotions';
+import { useStore } from '../../../../../hooks/api/store';
 import { getCurrencySymbol } from '../../../../../lib/data/currencies';
 import { DEFAULT_CAMPAIGN_VALUES } from '../../../../campaigns/common/constants';
 import { RulesFormField } from '../../../common/edit-rules/components/rules-form-field';
 import { AddCampaignPromotionFields } from '../../../promotion-add-campaign/components/add-campaign-promotion-form';
+import { buildVendorCreatePromotionPayload } from './build-vendor-create-promotion-payload';
 import { Tab } from './constants';
 import { CreatePromotionSchema, type CreatePromotionSchemaType } from './form-schema';
 import { templates } from './templates';
@@ -51,6 +52,7 @@ const defaultValues = {
   type: 'standard' as PromotionTypeValues,
   status: 'draft' as PromotionStatusValues,
   rules: [],
+  is_tax_inclusive: false,
   application_method: {
     allocation: 'each' as ApplicationMethodAllocationValues,
     type: 'percentage' as ApplicationMethodTypeValues,
@@ -82,6 +84,14 @@ export const CreatePromotionForm = () => {
   const { setValue, reset, getValues } = form;
 
   const { mutateAsync: createPromotion } = useCreatePromotion();
+  const { store } = useStore();
+
+  const defaultCurrencyCode = useMemo(
+    () =>
+      store?.supported_currencies?.find(c => c.is_default)?.currency_code ||
+      store?.supported_currencies?.[0]?.currency_code,
+    [store]
+  );
 
   const handleSubmit = form.handleSubmit(
     async data => {
@@ -90,78 +100,20 @@ export const CreatePromotionForm = () => {
         return;
       }
 
-      const {
-        campaign_choice: _campaignChoice,
-        template_id: _templateId,
-        application_method,
-        rules,
-        status,
-        ...promotionData
-      } = data;
-      const {
-        target_rules: targetRulesData = [],
-        buy_rules: buyRulesData = [],
-        currency_code: _currencyCode,
-        ...applicationMethodData
-      } = application_method;
+      createPromotion(buildVendorCreatePromotionPayload(data), {
+        onSuccess: ({ promotion }) => {
+          toast.success(
+            t('promotions.toasts.promotionCreateSuccess', {
+              code: promotion.code
+            })
+          );
 
-      const disguisedRules = [
-        ...targetRulesData.filter(r => !!r.disguised),
-        ...buyRulesData.filter(r => !!r.disguised),
-        ...rules.filter(r => !!r.disguised)
-      ];
-
-      const applicationMethodRuleData: Record<any, any> = {};
-
-      for (const rule of disguisedRules) {
-        applicationMethodRuleData[rule.attribute] =
-          rule.field_type === 'number' ? parseInt(rule.values as string) : rule.values;
-      }
-
-      const buildRulesData = (
-        rules: {
-          operator: string;
-          attribute: string;
-          values: any[] | any;
-          disguised?: boolean;
-        }[]
-      ) => {
-        return rules
-          .filter(r => !r.disguised)
-          .map(rule => ({
-            operator: rule.operator as PromotionRuleOperatorValues,
-            attribute: rule.attribute,
-            values: rule.values
-          }));
-      };
-
-      createPromotion(
-        {
-          ...promotionData,
-          rules: buildRulesData(rules),
-          status,
-          application_method: {
-            ...applicationMethodData,
-            ...applicationMethodRuleData,
-            target_rules: buildRulesData(targetRulesData)
-          },
-          is_automatic: false
+          handleSuccess(`/promotions/${promotion.id}`);
         },
-        {
-          onSuccess: ({ promotion }) => {
-            toast.success(
-              t('promotions.toasts.promotionCreateSuccess', {
-                code: promotion.code
-              })
-            );
-
-            handleSuccess(`/promotions/${promotion.id}`);
-          },
-          onError: e => {
-            toast.error(e.message);
-          }
+        onError: e => {
+          toast.error(e.message);
         }
-      );
+      });
     },
     async error => {
       const { campaign: _campaign, ...rest } = error || {};
@@ -191,7 +143,7 @@ export const CreatePromotionForm = () => {
         setTab(tab);
         break;
       case Tab.CAMPAIGN: {
-        const valid = await form.trigger(['code', 'application_method.value']);
+        const valid = await form.trigger();
 
         if (!valid) {
           setTabState({
@@ -220,22 +172,10 @@ export const CreatePromotionForm = () => {
         handleTabChange(Tab.PROMOTION);
         break;
       case Tab.PROMOTION: {
-        const valid = !!form.getValues('code') && !!form.getValues('application_method.value');
+        const valid = await form.trigger();
 
         if (valid) {
           handleTabChange(Tab.CAMPAIGN);
-        }
-
-        if (!form.getValues('code')) {
-          form.setError('code', {
-            message: t('promotions.errors.requiredField')
-          });
-        }
-
-        if (!form.getValues('application_method.value')) {
-          form.setError('application_method.value', {
-            message: t('promotions.errors.requiredField')
-          });
         }
 
         break;
@@ -310,12 +250,13 @@ export const CreatePromotionForm = () => {
   const isTargetTypeOrder = targetType === 'order';
 
   const formData = form.getValues();
+  const resolvedCurrencyCode = formData.application_method.currency_code || defaultCurrencyCode;
   let campaignQuery: object = {};
 
-  if (isFixedValueType && formData.application_method.currency_code) {
+  if (isFixedValueType && resolvedCurrencyCode) {
     campaignQuery = {
       budget: {
-        currency_code: formData.application_method.currency_code
+        currency_code: resolvedCurrencyCode
       }
     };
   }
@@ -345,8 +286,7 @@ export const CreatePromotionForm = () => {
           ...DEFAULT_CAMPAIGN_VALUES,
           budget: {
             ...DEFAULT_CAMPAIGN_VALUES.budget,
-            type: 'usage',
-            currency_code: formData.application_method.currency_code
+            type: 'usage'
           }
         });
       }
@@ -368,10 +308,10 @@ export const CreatePromotionForm = () => {
       if (!Array.isArray(ruleValue) && currencyCode !== ruleValue) {
         form.setValue('application_method.currency_code', ruleValue as string);
       }
-    } else if (currencyCode) {
-      form.setValue('application_method.currency_code', undefined);
+    } else if (defaultCurrencyCode && currencyCode !== defaultCurrencyCode) {
+      form.setValue('application_method.currency_code', defaultCurrencyCode);
     }
-  }, [watchRules, form]);
+  }, [watchRules, form, defaultCurrencyCode]);
 
   return (
     <RouteFocusModal.Form form={form}>
@@ -651,7 +591,9 @@ export const CreatePromotionForm = () => {
                         control={form.control}
                         name="application_method.value"
                         render={({ field: { onChange, value, ...field } }) => {
-                          const currencyCode = form.getValues().application_method.currency_code;
+                          const currencyCode =
+                            form.getValues().application_method.currency_code ||
+                            defaultCurrencyCode;
 
                           return (
                             <Form.Item className="basis-1/2">
@@ -673,7 +615,7 @@ export const CreatePromotionForm = () => {
                                     onValueChange={value => {
                                       onChange(value ? parseInt(value) : '');
                                     }}
-                                    code={currencyCode || 'USD'}
+                                    code={currencyCode ?? defaultCurrencyCode ?? 'THB'}
                                     symbol={currencyCode ? getCurrencySymbol(currencyCode) : '$'}
                                     value={value}
                                     // disabled={!currencyCode}
