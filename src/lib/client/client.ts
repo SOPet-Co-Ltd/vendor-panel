@@ -3,8 +3,6 @@ import Medusa from '@medusajs/js-sdk';
 export const backendUrl = __BACKEND_URL__ ?? '/';
 export const publishableApiKey = __PUBLISHABLE_API_KEY__ ?? '';
 
-const token = window.localStorage.getItem('medusa_auth_token') || '';
-
 const decodeJwt = (token: string) => {
   try {
     const payload = token.split('.')[1];
@@ -25,6 +23,14 @@ const isTokenExpired = (token: string | null) => {
   return payload.exp * 1000 < Date.now();
 };
 
+export const getAuthToken = () => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return window.localStorage.getItem('medusa_auth_token');
+};
+
 export const sdk = new Medusa({
   baseUrl: backendUrl,
   publishableKey: publishableApiKey
@@ -36,6 +42,11 @@ if (typeof window !== 'undefined') {
 }
 
 export const importProductsQuery = async (file: File) => {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No authentication token');
+  }
+
   const formData = new FormData();
   formData.append('file', file);
 
@@ -67,6 +78,11 @@ export const uploadFilesQuery = async (
   files: { file: File }[],
   folder?: string
 ): Promise<VendorMediaUploadResponse> => {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No authentication token');
+  }
+
   const formData = new FormData();
   for (const { file } of files) {
     formData.append('files', file);
@@ -101,7 +117,11 @@ export const updateProductMedia = async (
   productId: string,
   payload: UpdateProductMediaPayload
 ): Promise<UpdateProductMediaResponse> => {
-  const bearer = window.localStorage.getItem('medusa_auth_token') || '';
+  const bearer = getAuthToken();
+  if (!bearer) {
+    throw new Error('No authentication token');
+  }
+
   const res = await fetch(`${backendUrl}/vendor/products/${productId}/media`, {
     method: 'PATCH',
     headers: {
@@ -119,6 +139,11 @@ export const updateProductMedia = async (
 };
 
 export const deleteFilesQuery = async (fileIds: string[]) => {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error('No authentication token');
+  }
+
   if (!fileIds || fileIds.length === 0) {
     return;
   }
@@ -150,7 +175,7 @@ export const fetchQuery = async (
     headers?: { [key: string]: string };
   }
 ) => {
-  const bearer = (await window.localStorage.getItem('medusa_auth_token')) || '';
+  const bearer = getAuthToken() || '';
   const params = Object.entries(query || {}).reduce((acc, [key, value]) => {
     if (value !== null && value !== undefined && value !== '') {
       if (Array.isArray(value)) {
@@ -187,7 +212,7 @@ export const fetchQuery = async (
     const errorData = await response.json();
 
     if (response.status === 401) {
-      if (isTokenExpired(token)) {
+      if (isTokenExpired(bearer)) {
         localStorage.removeItem('medusa_auth_token');
         window.location.href = '/login?reason=Unauthorized';
         return;

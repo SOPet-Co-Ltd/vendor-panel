@@ -129,9 +129,8 @@ export const ProductCreateForm = ({ defaultChannel, store }: ProductCreateFormPr
       if (error instanceof Error) {
         toast.error(error.message);
       }
+      return;
     }
-
-    const customAdditionalDataValues: Record<string, string>[] = [];
     if (payload.custom_tag_1) {
       customAdditionalDataValues.push({ custom_tag_1: payload.custom_tag_1 });
     }

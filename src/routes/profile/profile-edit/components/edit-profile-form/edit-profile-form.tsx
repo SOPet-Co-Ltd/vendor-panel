@@ -89,6 +89,7 @@ export const EditProfileForm = ({ user }: EditProfileProps) => {
       if (error instanceof Error) {
         toast.error(error.message);
       }
+      return;
     }
 
     await mutateAsync(

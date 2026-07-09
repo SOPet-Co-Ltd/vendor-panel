@@ -115,6 +115,7 @@ export const EditStoreForm = ({ seller }: { seller: StoreVendor }) => {
       if (error instanceof Error) {
         toast.error(error.message);
       }
+      return;
     }
 
     // Use uploaded URL if new file was uploaded, otherwise use existing photo from media array or seller.photo

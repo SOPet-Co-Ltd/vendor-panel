@@ -112,7 +112,8 @@ export const EditProductMediaForm = ({ product }: ProductMediaViewProps) => {
           type: 'invalid_file',
           message: t('products.media.failedToUpload')
         });
-        uploaded = [];
+        toast.error(t('products.media.failedToUpload'));
+        return;
       }
     }
 
